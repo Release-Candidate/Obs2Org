@@ -55,16 +55,16 @@ jobs:
       #   shell: cmd
       #   run: |
       #     call pipenv shell
-      #     python -m PYTHON_TEMPLATE --version
+      #     python -m prb2org --version
 
-      - name: Run PYTHON_TEMPLATE ${{ matrix.python-version }}
+      - name: Run prb2org ${{ matrix.python-version }}
         run: |
-          pipenv run python -m PYTHON_TEMPLATE -y
+          pipenv run python -m prb2org -y
 
       # - uses: actions/upload-artifact@v2
       #  if: ${{ always() }}
       #   with:
-      #     name: Windows PYTHON_TEMPLATE Debug Log
+      #     name: Windows prb2org Debug Log
       #     path: log_file.txt
 
   use-package:
@@ -83,27 +83,27 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
-          key: windows-2019-${{ matrix.python-version }}-pip-PYTHON_TEMPLATE
+          key: windows-2019-${{ matrix.python-version }}-pip-
           restore-keys: |
-            windows-2019-${{ matrix.python-version }}-pip-PYTHON_TEMPLATE
+            windows-2019-${{ matrix.python-version }}-pip-
 
-      - name: Install PYTHON_TEMPLATE package ${{ matrix.python-version }}
-        run: python -m pip install --upgrade PYTHON_TEMPLATE
+      - name: Install prb2org package ${{ matrix.python-version }}
+        run: python -m pip install --upgrade
 
       - name: Delete Source ${{ matrix.python-version }}
         run: |
-          Remove-Item PYTHON_TEMPLATE -Recurse
+          Remove-Item prb2org -Recurse
 
       # - name: Check if Pkg Working ${{ matrix.python-version }}
       #   run: |
-      #     python -m PYTHON_TEMPLATE --version
+      #     python -m prb2org --version
 
-      - name: Run PYTHON_TEMPLATE Pkg ${{ matrix.python-version }}
+      - name: Run prb2org Pkg ${{ matrix.python-version }}
         run: |
-          python -m PYTHON_TEMPLATE -y
+          python -m prb2org -y
 
       # - uses: actions/upload-artifact@v2
       #  if: ${{ always() }}
       #   with:
-      #     name: Windows PYTHON_TEMPLATE Pkg Debug Log
+      #     name: Windows prb2org Pkg Debug Log
       #     path: log_file.txt
