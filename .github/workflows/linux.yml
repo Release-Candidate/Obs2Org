@@ -56,19 +56,18 @@ jobs:
       # - name: Check if Working ${{ matrix.python-version }}
       #   run: |
       #     cd $GITHUB_WORKSPACE
-      #     pipenv run python -m PYTHON_TEMPLATE --version
+      #     pipenv run python -m orb2org --version
 
-      - name: Run PYTHON_TEMPLATE ${{ matrix.python-version }}
+      - name: Run orb2org ${{ matrix.python-version }}
         run: |
           cd $GITHUB_WORKSPACE
-          pipenv run python -m PYTHON_TEMPLATE -y
+          pipenv run python -m orb2org -y
 
       # - uses: actions/upload-artifact@v2
       #  if: ${{ always() }}
       #   with:
-      #     name: Linux PYTHON_TEMPLATE Debug Log
+      #     name: Linux orb2org Debug Log
       #     path: log_file.txt
-
 
   use-package:
     runs-on: ubuntu-20.04
@@ -86,25 +85,25 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-${{ matrix.python-version }}-pip-PYTHON_TEMPLATE
+          key: ${{ runner.os }}-${{ matrix.python-version }}-pip-orb2org
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.python-version }}-pip-PYTHON_TEMPLATE
+            ${{ runner.os }}-${{ matrix.python-version }}-pip-orb2org
 
-      - name: Install PYTHON_TEMPLATE package ${{ matrix.python-version }}
-        run: python -m pip install --upgrade PYTHON_TEMPLATE
+      - name: Install orb2org package ${{ matrix.python-version }}
+        run: python -m pip install --upgrade orb2org
 
       - name: Delete Source ${{ matrix.python-version }}
         run: |
           cd $GITHUB_WORKSPACE
-          rm -rf PYTHON_TEMPLATE/
+          rm -rf orb2org/
 
-      - name: Run PYTHON_TEMPLATE Pkg ${{ matrix.python-version }}
+      - name: Run orb2org Pkg ${{ matrix.python-version }}
         run: |
           cd $GITHUB_WORKSPACE
-          python -m PYTHON_TEMPLATE -y
+          python -m orb2org -y
 
       # - uses: actions/upload-artifact@v2
       #  if: ${{ always() }}
       #   with:
-      #     name: Linux PYTHON_TEMPLATE Pkg Debug Log
+      #     name: Linux orb2org Pkg Debug Log
       #     path: log_file.txt

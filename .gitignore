@@ -132,3 +132,9 @@ dmypy.json
 PYTHON_TEMPLATE/doc/doctrees/**
 PYTHON_TEMPLATE/doc/doctrees/index.doctree
 PYTHON_TEMPLATE/doc/html/**
+
+# Emacs files
+*~
+*\#
+\#*
+.\#*

@@ -17,12 +17,12 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../../../"))
 
-from PYTHON_TEMPLATE import VERSION  # noqa: E402
+from Obs2Org import VERSION  # noqa: E402
 
 
 # -- Project information -----------------------------------------------------
 
-project = "PYTHON_TEMPLATE"
+project = "Obs2Org"
 copyright = "2021, Release-Candidate"
 author = "Release-Candidate"
 version = VERSION

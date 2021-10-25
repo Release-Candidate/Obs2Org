@@ -17,4 +17,4 @@ testpaths = [
 
 junit_family = "xunit2"
 
-junit_suite_name = "PYTHON_TEMPLATE Tests"
+junit_suite_name = "Obs2Org Tests"

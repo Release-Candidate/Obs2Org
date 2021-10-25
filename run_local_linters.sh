@@ -1,17 +1,17 @@
 #!/bin/sh
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2021 Roland Csaszar
 #
-# Project:  PYTHON_TEMPLATE
+# Project:  Obs2Org
 # File:     run_local_linters.sh
 #
 ################################################################################
 
 # Runs the local linters
-isort PYTHON_TEMPLATE tests
-black PYTHON_TEMPLATE tests
-pyflakes PYTHON_TEMPLATE tests
-pycodestyle PYTHON_TEMPLATE tests
-pydocstyle PYTHON_TEMPLATE tests
-flake8 PYTHON_TEMPLATE tests
-bandit -r PYTHON_TEMPLATE tests
+isort Obs2Org tests
+black Obs2Org tests
+pyflakes Obs2Org tests
+pycodestyle Obs2Org tests
+pydocstyle Obs2Org tests
+flake8 Obs2Org tests
+bandit -r Obs2Org tests

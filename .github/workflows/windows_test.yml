@@ -106,12 +106,12 @@ jobs:
       - name: Install dependencies using pipenv ${{ matrix.python-version }}
         run: |
           python -m pipenv install --dev
-          python -m pipenv install PYTHON_TEMPLATE
+          python -m pipenv install orb2org
           python -m pipenv update
 
       - name: Run Tests ${{ matrix.python-version }}
         run: |
-          Remove-Item PYTHON_TEMPLATE -Recurse
+          Remove-Item orb2org -Recurse
           pipenv run pytest --hypothesis-show-statistics --cov=./ --cov-report=xml
 
       - name: Upload coverage to Codecov ${{ matrix.python-version }}

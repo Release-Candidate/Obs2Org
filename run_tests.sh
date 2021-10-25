@@ -1,8 +1,8 @@
 #!/bin/sh
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2021 Roland Csaszar
 #
-# Project:  PYTHON_TEMPLATE
+# Project:  Obs2Org
 # File:     run_tests.bat
 #
 ################################################################################

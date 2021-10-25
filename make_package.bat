@@ -1,7 +1,7 @@
-:: SPDX-License-Identifier: MIT
+:: SPDX-License-Identifier: GPL-3.0-or-later
 :: Copyright (C) 2021 Roland Csaszar
 ::
-:: Project:  PYTHON_TEMPLATE
+:: Project:  Obs2Org
 :: File:     make_package.bat
 ::
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -9,7 +9,7 @@
 :: generates a Python PIP package in the current working directory and uploads
 :: it to Pypi.
 :: Uses pipenv, you can install that by `python -m pip install pipenv` and
-:: installing the needed packages from the PYTHON_TEMPLATE root dir `PYTHON_TEMPLATE` - where
+:: installing the needed packages from the Obs2Org root dir `Obs2Org` - where
 :: the `Pipfile` is located.
 :: `pipenv install --dev` installs all needed dependencies to develop.
 
@@ -17,7 +17,7 @@
 
 rmdir /S /Q build
 rmdir /S /Q dist
-rmdir /S /Q PYTHON_TEMPLATE.egg-info
+rmdir /S /Q Obs2Org.egg-info
 
 ::pipenv run python -m build
 echo Do not build the package under Windows, the file permissions are lost, shell

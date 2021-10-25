@@ -1,7 +1,7 @@
 include LICENSE
 include CHANGELOG.md
 
-graft PYTHON_TEMPLATE/doc/html
-graft PYTHON_TEMPLATE/doc/doctrees
+graft Obs2Org/doc/html
+graft Obs2Org/doc/doctrees
 
 global-exclude *.py[cod]

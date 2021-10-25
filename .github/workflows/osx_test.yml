@@ -107,13 +107,13 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           python -m pipenv install --dev
-          python -m pipenv install PYTHON_TEMPLATE
+          python -m pipenv install orb2org
           python -m pipenv update
 
       - name: Run Tests ${{ matrix.python-version }}
         run: |
           cd $GITHUB_WORKSPACE
-          rm -rf PYTHON_TEMPLATE
+          rm -rf orb2org
           pipenv run pytest --hypothesis-show-statistics --cov=./ --cov-report=xml
 
       - name: Upload coverage to Codecov ${{ matrix.python-version }}
