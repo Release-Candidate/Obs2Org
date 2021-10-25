@@ -1,0 +1,133 @@
+name: Tests Ubuntu 20.04
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_run:
+    workflows: ["Pip Package"]
+    types: [completed]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  tests-src:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip ${{ matrix.python-version }}
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-${{ matrix.python-version }}-pip-pipenv
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.python-version }}-pip-pipenv
+
+      - name: Cache pipenv ${{ matrix.python-version }}
+        uses: actions/cache@v2
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-${{ matrix.python-version }}-pipenv-${{ hashFiles('Pipfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.python-version }}-pipenv-
+
+      - name: Setup pipenv ${{ matrix.python-version }}
+        run: python -m pip install --upgrade pipenv
+
+      - name: Install dependencies using pipenv ${{ matrix.python-version }}
+        run: |
+          cd $GITHUB_WORKSPACE
+          python -m pipenv install --dev
+
+      - name: Run Tests ${{ matrix.python-version }}
+        run: |
+          cd $GITHUB_WORKSPACE
+          pipenv run pytest --hypothesis-show-statistics --cov=./ --cov-report=xml
+
+      - name: Upload coverage to Codecov ${{ matrix.python-version }}
+        uses: codecov/codecov-action@v1
+        if: ${{ always() }}
+        with:
+          token: ${{ secrets.CODECOV_SECRET }}
+          files: ./coverage.xml
+          directory: ./coverage/reports/
+          # flags: unittest
+          env_vars: OS,PYTHON
+          name: Linux-Test-Src
+          fail_ci_if_error: false
+          path_to_write_report: ./coverage/codecov_report.txt
+          verbose: true
+
+  tests-package:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-${{ matrix.python-version }}-pip-pipenv
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.python-version }}-pip-pipenv
+
+      - name: Cache pipenv ${{ matrix.python-version }}
+        uses: actions/cache@v2
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-package-${{ hashFiles('Pipfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.python-version }}-pipenv-package-
+
+      - name: Setup pipenv ${{ matrix.python-version }}
+        run: |
+          python -m pip install --upgrade pipenv
+
+      - name: Install dependencies using pipenv ${{ matrix.python-version }}
+        run: |
+          cd $GITHUB_WORKSPACE
+          python -m pipenv install --dev
+          python -m pipenv install PYTHON_TEMPLATE
+          python -m pipenv update
+
+      - name: Run Tests ${{ matrix.python-version }}
+        run: |
+          cd $GITHUB_WORKSPACE
+          rm -rf PYTHON_TEMPLATE/
+          pipenv run pytest --hypothesis-show-statistics --cov=./ --cov-report=xml
+
+      - name: Upload coverage to Codecov ${{ matrix.python-version }}
+        uses: codecov/codecov-action@v1
+        if: ${{ always() }}
+        with:
+          token: ${{ secrets.CODECOV_SECRET }}
+          files: ./coverage.xml
+          directory: ./coverage/reports/
+          # flags: unittest
+          env_vars: OS,PYTHON
+          name: Linux-Test-Pkg
+          fail_ci_if_error: false
+          path_to_write_report: ./coverage/codecov_report.txt
+          verbose: true

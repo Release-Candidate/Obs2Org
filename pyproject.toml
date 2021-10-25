@@ -1,0 +1,20 @@
+[build-system]
+requires = [
+    "setuptools>=50",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+markers = [
+    "run_program: tests that run the whole program, not only a part of it",
+    "fast: marks test as fast",
+    "slow: marks test as slow, you can also use '-m \"not slow\"'",
+]
+testpaths = [
+    "tests",
+]
+
+junit_family = "xunit2"
+
+junit_suite_name = "PYTHON_TEMPLATE Tests"

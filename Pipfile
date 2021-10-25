@@ -1,0 +1,31 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+
+[dev-packages]
+pylama = "*"
+black = "*"
+pre-commit = "*"
+flake8 = "*"
+flake8-polyfill = "*"
+bandit = "*"
+pytest = "*"
+sphinx = "*"
+build = "*"
+setuptools = "*"
+sphinx-rtd-theme = "*"
+twine = "*"
+hypothesis = "*"
+pytest-xdist = "*"
+pytest-cov = "*"
+colorama = "*"
+isort = "*"
+
+[requires]
+python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true

@@ -1,0 +1,47 @@
+name: Bandit
+
+on: [push, pull_request]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-pipenv
+          restore-keys: |
+            ${{ runner.os }}-pip-pipenv
+
+      - name: Cache pipenv
+        uses: actions/cache@v2
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pipenv-
+
+      - name: Setup pipenv
+        run: python -m pip install --upgrade pipenv
+
+      - name: Install dependencies using pipenv
+        run: |
+           cd $GITHUB_WORKSPACE
+           python -m pipenv install --dev
+
+      - name: Run Bandit
+        run: |
+          cd $GITHUB_WORKSPACE
+          pipenv run bandit -r PYTHON_TEMPLATE tests -f txt -o bandit_out.txt
+
+      - uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: Bandit Output
+          path: bandit_out.txt

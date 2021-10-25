@@ -1,0 +1,109 @@
+name: Windows 2019
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_run:
+    workflows: ["Pip Package"]
+    types: [completed]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build-src:
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip ${{ matrix.python-version }}
+        uses: actions/cache@v2
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: windows-2019-${{ matrix.python-version }}-pip-pipenv
+          restore-keys: |
+            windows-2019-${{ matrix.python-version }}-pip-pipenv
+
+      - name: Cache pipenv ${{ matrix.python-version }}
+        uses: actions/cache@v2
+        with:
+          path: ~/.virtualenvs
+          key: windows-2019-${{ matrix.python-version }}-pipenv-${{ hashFiles('Pipfile.lock') }}
+          restore-keys: |
+            windows-2019-${{ matrix.python-version }}-pipenv-
+
+      - name: Setup pipenv ${{ matrix.python-version }}
+        run: python -m pip install --upgrade pipenv
+
+      - name: Install dependencies using pipenv ${{ matrix.python-version }}
+        run: python -m pipenv install --dev
+
+      # - name: Check if Working ${{ matrix.python-version }}
+      #   shell: cmd
+      #   run: |
+      #     call pipenv shell
+      #     python -m PYTHON_TEMPLATE --version
+
+      - name: Run PYTHON_TEMPLATE ${{ matrix.python-version }}
+        run: |
+          pipenv run python -m PYTHON_TEMPLATE -y
+
+      # - uses: actions/upload-artifact@v2
+      #  if: ${{ always() }}
+      #   with:
+      #     name: Windows PYTHON_TEMPLATE Debug Log
+      #     path: log_file.txt
+
+  use-package:
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip ${{ matrix.python-version }}
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: windows-2019-${{ matrix.python-version }}-pip-PYTHON_TEMPLATE
+          restore-keys: |
+            windows-2019-${{ matrix.python-version }}-pip-PYTHON_TEMPLATE
+
+      - name: Install PYTHON_TEMPLATE package ${{ matrix.python-version }}
+        run: python -m pip install --upgrade PYTHON_TEMPLATE
+
+      - name: Delete Source ${{ matrix.python-version }}
+        run: |
+          Remove-Item PYTHON_TEMPLATE -Recurse
+
+      # - name: Check if Pkg Working ${{ matrix.python-version }}
+      #   run: |
+      #     python -m PYTHON_TEMPLATE --version
+
+      - name: Run PYTHON_TEMPLATE Pkg ${{ matrix.python-version }}
+        run: |
+          python -m PYTHON_TEMPLATE -y
+
+      # - uses: actions/upload-artifact@v2
+      #  if: ${{ always() }}
+      #   with:
+      #     name: Windows PYTHON_TEMPLATE Pkg Debug Log
+      #     path: log_file.txt

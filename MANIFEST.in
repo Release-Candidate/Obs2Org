@@ -1,0 +1,7 @@
+include LICENSE
+include CHANGELOG.md
+
+graft PYTHON_TEMPLATE/doc/html
+graft PYTHON_TEMPLATE/doc/doctrees
+
+global-exclude *.py[cod]

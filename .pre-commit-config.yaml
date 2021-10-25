@@ -1,0 +1,36 @@
+default_language_version:
+  python: python3.9
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: check-json
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+      - id: check-toml
+  - repo: https://github.com/psf/black
+    rev: 20.8b1
+    hooks:
+      - id: black
+
+  - repo: https://gitlab.com/PyCQA/flake8
+    rev: 3.9.0
+    hooks:
+      - id: flake8
+
+  - repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.0.0
+    hooks:
+      - id: pydocstyle
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.7.0
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.0
+    hooks:
+      - id: bandit
