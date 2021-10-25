@@ -8,7 +8,6 @@
 
 from __future__ import annotations
 
-
 __all__ = []
 
 VERSION: str = "0.0,1"

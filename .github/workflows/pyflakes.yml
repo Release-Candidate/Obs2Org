@@ -38,7 +38,7 @@ jobs:
       - name: Run Pyflakes
         run: |
           cd $GITHUB_WORKSPACE
-          pipenv run pyflakes orb2org tests > pyflakes_out.txt 2>&1
+          pipenv run pyflakes obs2org tests > pyflakes_out.txt 2>&1
 
       - uses: actions/upload-artifact@v2
         if: ${{ always() }}

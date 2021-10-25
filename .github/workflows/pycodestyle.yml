@@ -38,7 +38,7 @@ jobs:
       - name: Run Pycodestyle
         run: |
           cd $GITHUB_WORKSPACE
-          pipenv run pycodestyle orb2org tests > pycodestyle_out.txt 2>&1
+          pipenv run pycodestyle obs2org tests > pycodestyle_out.txt 2>&1
 
       - uses: actions/upload-artifact@v2
         if: ${{ always() }}

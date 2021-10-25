@@ -38,7 +38,7 @@ jobs:
       - name: Run Pydocstyle
         run: |
           cd $GITHUB_WORKSPACE
-          pipenv run pydocstyle orb2org tests > pydocstyle_out.txt 2>&1
+          pipenv run pydocstyle obs2org tests > pydocstyle_out.txt 2>&1
 
       - uses: actions/upload-artifact@v2
         if: ${{ always() }}

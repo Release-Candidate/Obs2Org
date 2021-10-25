@@ -38,7 +38,7 @@ jobs:
       - name: Run Flake8
         run: |
           cd $GITHUB_WORKSPACE
-          pipenv run flake8 prb2org tests > flake8_out.txt 2>&1
+          pipenv run flake8 obs2org tests > flake8_out.txt 2>&1
 
       - uses: actions/upload-artifact@v2
         if: ${{ always() }}

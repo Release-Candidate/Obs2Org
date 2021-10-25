@@ -55,16 +55,16 @@ jobs:
       #   shell: cmd
       #   run: |
       #     call pipenv shell
-      #     python -m prb2org --version
+      #     python -m obs2org --version
 
-      - name: Run prb2org ${{ matrix.python-version }}
+      - name: Run obs2org ${{ matrix.python-version }}
         run: |
-          pipenv run python -m prb2org -y
+          pipenv run python -m obs2org -y
 
       # - uses: actions/upload-artifact@v2
       #  if: ${{ always() }}
       #   with:
-      #     name: Windows prb2org Debug Log
+      #     name: Windows obs2org Debug Log
       #     path: log_file.txt
 
   use-package:
@@ -87,23 +87,23 @@ jobs:
           restore-keys: |
             windows-2019-${{ matrix.python-version }}-pip-
 
-      - name: Install prb2org package ${{ matrix.python-version }}
+      - name: Install obs2org package ${{ matrix.python-version }}
         run: python -m pip install --upgrade
 
       - name: Delete Source ${{ matrix.python-version }}
         run: |
-          Remove-Item prb2org -Recurse
+          Remove-Item obs2org -Recurse
 
       # - name: Check if Pkg Working ${{ matrix.python-version }}
       #   run: |
-      #     python -m prb2org --version
+      #     python -m obs2org --version
 
-      - name: Run prb2org Pkg ${{ matrix.python-version }}
+      - name: Run obs2org Pkg ${{ matrix.python-version }}
         run: |
-          python -m prb2org -y
+          python -m obs2org -y
 
       # - uses: actions/upload-artifact@v2
       #  if: ${{ always() }}
       #   with:
-      #     name: Windows prb2org Pkg Debug Log
+      #     name: Windows obs2org Pkg Debug Log
       #     path: log_file.txt

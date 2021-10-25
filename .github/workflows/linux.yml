@@ -56,17 +56,17 @@ jobs:
       # - name: Check if Working ${{ matrix.python-version }}
       #   run: |
       #     cd $GITHUB_WORKSPACE
-      #     pipenv run python -m orb2org --version
+      #     pipenv run python -m obs2org --version
 
-      - name: Run orb2org ${{ matrix.python-version }}
+      - name: Run obs2org ${{ matrix.python-version }}
         run: |
           cd $GITHUB_WORKSPACE
-          pipenv run python -m orb2org -y
+          pipenv run python -m obs2org -y
 
       # - uses: actions/upload-artifact@v2
       #  if: ${{ always() }}
       #   with:
-      #     name: Linux orb2org Debug Log
+      #     name: Linux obs2org Debug Log
       #     path: log_file.txt
 
   use-package:
@@ -85,25 +85,25 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-${{ matrix.python-version }}-pip-orb2org
+          key: ${{ runner.os }}-${{ matrix.python-version }}-pip-obs2org
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.python-version }}-pip-orb2org
+            ${{ runner.os }}-${{ matrix.python-version }}-pip-obs2org
 
-      - name: Install orb2org package ${{ matrix.python-version }}
-        run: python -m pip install --upgrade orb2org
+      - name: Install obs2org package ${{ matrix.python-version }}
+        run: python -m pip install --upgrade obs2org
 
       - name: Delete Source ${{ matrix.python-version }}
         run: |
           cd $GITHUB_WORKSPACE
-          rm -rf orb2org/
+          rm -rf obs2org/
 
-      - name: Run orb2org Pkg ${{ matrix.python-version }}
+      - name: Run obs2org Pkg ${{ matrix.python-version }}
         run: |
           cd $GITHUB_WORKSPACE
-          python -m orb2org -y
+          python -m obs2org -y
 
       # - uses: actions/upload-artifact@v2
       #  if: ${{ always() }}
       #   with:
-      #     name: Linux orb2org Pkg Debug Log
+      #     name: Linux obs2org Pkg Debug Log
       #     path: log_file.txt
