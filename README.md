@@ -1,9 +1,6 @@
 # Obs2Org
 
-Python repository template.
 
-Search and replace `Obs2Org` in all files in this repository with the real project name.
-And ``Release-Candidate`` if you aren't me :D
 
 Set CODECOV_SECRET to the Codecov token.
 
@@ -15,6 +12,14 @@ Set PIP_TOKEN to the PyPI token.
 [![Read The Docs badge](https://readthedocs.org/projects/obs2org/badge/?version=latest)](https://obs2org.readthedocs.io/en/latest/?badge=latest)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [more badges](#badges)
+
+
+## Development
+
+1. Run `pipenv install --dev` to install the Python environment in the project directory
+2. `pre-commit` and `pre-commit install`
+
+- To run the checks manually: `pre-commit run --all-files`
 
 ## Badges
 
