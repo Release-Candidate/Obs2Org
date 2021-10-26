@@ -17,7 +17,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../../../"))
 
-from Obs2Org import VERSION  # noqa: E402
+from obs2org import VERSION  # noqa: E402
 
 # -- Project information -----------------------------------------------------
 
