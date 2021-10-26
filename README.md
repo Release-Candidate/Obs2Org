@@ -12,7 +12,7 @@ Set PIP_TOKEN to the PyPI token.
 [![GPLv3 license badge](https://img.shields.io/github/license/Release-Candidate/Obs2Org)](https://github.com/Release-Candidate/Obs2Org/blob/main/LICENSE)
 [![Python version badge](https://img.shields.io/pypi/pyversions/Obs2Org)](https://www.python.org/downloads/)
 [![PIP version badge](https://img.shields.io/pypi/v/Obs2Org)](https://pypi.org/project/Obs2Org/)
-[![ReadTheDocs badge](https://readthedocs.org/projects/Obs2Org/badge/?version=latest)](https://Obs2Org.readthedocs.io/en/latest/?badge=latest)
+[![Read The Docs badge](https://readthedocs.org/projects/obs2org/badge/?version=latest)](https://obs2org.readthedocs.io/en/latest/?badge=latest)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [more badges](#badges)
 
