@@ -15,3 +15,5 @@ pycodestyle Obs2Org tests
 pydocstyle Obs2Org tests
 flake8 Obs2Org tests
 bandit -r Obs2Org tests
+
+pre-commit run --all-files

@@ -25,7 +25,6 @@ if sys.version_info.major < 3 or sys.version_info.minor < 8:
     )
     sys.exit(1)
 
-
 if __name__ == "__main__":
     from obs2org import main
 
