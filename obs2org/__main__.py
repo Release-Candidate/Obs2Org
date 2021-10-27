@@ -5,8 +5,9 @@
 # File:     __main__.py
 # Date:     26.10.2021
 # ===============================================================================
-
-"""The main entry point of the program, does nothing but call the 'real' main function `main`."""
+"""The main entry point of the program, does nothing but call the 'real' main
+function `main`.
+"""
 
 # This is just a wrapper to catch when running using python 2. The real `main`
 # is in `main.py`.

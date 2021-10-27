@@ -8,12 +8,13 @@
 ################################################################################
 
 # Runs the local linters
-isort Obs2Org tests
-black Obs2Org tests
-pyflakes Obs2Org tests
-pycodestyle Obs2Org tests
-pydocstyle Obs2Org tests
-flake8 Obs2Org tests
-bandit -r Obs2Org tests
+isort obs2org tests
+black obs2org tests
+pyflakes obs2org tests
+pycodestyle obs2org tests
+pydocstyle obs2org tests
+flake8 obs2org tests
+bandit -r obs2org tests
+
 
 pre-commit run --all-files
