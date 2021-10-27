@@ -99,7 +99,13 @@ def parse_command_line() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
         "files",
         metavar="MARKDOWN_FILES",
         nargs="*",
-        help="The path to the markdown files or directory to convert to Org-Mode format. If this is a file or a list of markdown files, these files are converted. If this is a directory, all markdown files - files with a suffix of '.md' - in this directory will be converted recursively descending into subdirectories. If no markdown files or directory are given, the current working directory is used.",
+        help="""The path to the markdown files or directory to convert to
+Org-Mode format. If this is a file or a list of markdown
+files, these files are converted. If this is a directory,
+all markdown files - files with a suffix of '.md' - in
+this directory will be converted recursively descending
+into subdirectories. If no markdown files or directory
+are given, the current working directory is used.""",
         default="./",
     )
 
@@ -117,7 +123,8 @@ def parse_command_line() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
         type=str,
         dest="pandoc_exe",
         default="pandoc",
-        help="""PANDOC is the path to the pandoc executable, if the Pandoc executable isn't in the PATH.""",
+        help="""PANDOC is the path to the pandoc executable, if the
+Pandoc executable isn't in the PATH.""",
     )
 
     cmd_line_parser.add_argument(
@@ -127,10 +134,13 @@ def parse_command_line() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
         type=str,
         dest="out_path",
         default="./",
-        help="""OUT_PATH is the path to the file or directory to save the converted Org-Mode file to.
-If MARKDOWN_FILES is a single file this is used as the filename of the converted file.
-If MARKDOWN_FILES are more than one file or a directory, this is used as the pathname
-of the directory to save the converted files to.""",
+        help="""OUT_PATH is the path to the file or directory to save the
+converted Org-Mode file to.
+If MARKDOWN_FILES is a single file this is used as the
+filename of the converted file.
+If MARKDOWN_FILES are more than one file or a directory,
+this is used as the pathname of the directory to save the
+converted files to.""",
     )
 
     return cmd_line_parser.parse_args(), cmd_line_parser
