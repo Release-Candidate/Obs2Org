@@ -10,9 +10,11 @@
 from __future__ import annotations
 
 import argparse
-from os import path
+from os import path, walk
+from pathlib import PurePath
 
 from obs2org import VERSION
+from obs2org.convert import convert_single_file
 
 __descriptionText: str = (
     """Converts markdown formatted files to Org-Mode formatted files using Pandoc."""
@@ -56,21 +58,7 @@ def main() -> None:
     """The program's main entry point."""
     cmd_line_args, cmd_line_parser = parse_command_line()
 
-    if isinstance(cmd_line_args.files, list):
-        path_list = cmd_line_args.files
-    else:
-        path_list = [cmd_line_args.files]
-
-    for arg_path in path_list:
-        if path.isdir(arg_path):
-            print("Search directory: {arg}".format(arg=arg_path))
-        elif path.isfile(arg_path):
-            print("Convert file: {file}".format(file=arg_path))
-        else:
-            cmd_line_parser.print_help()
-            cmd_line_parser.error(
-                "no markdown files found in path '{path}'".format(path=arg_path)
-            )
+    convert_files(cmd_line_args=cmd_line_args, cmd_line_parser=cmd_line_parser)
 
 
 ###############################################################################
@@ -144,3 +132,63 @@ converted files to.""",
     )
 
     return cmd_line_parser.parse_args(), cmd_line_parser
+
+
+###############################################################################
+def convert_files(
+    cmd_line_args: argparse.Namespace, cmd_line_parser: argparse.ArgumentParser
+) -> None:
+    """Convert the markdown files to Org-Mode files.
+
+    Convert the given markdown files or markdown files in the given
+    directory to Org-Mode format.
+
+    Parameters
+    ----------
+    cmd_line_args : argparse.Namespace
+        The command line arguments of the program.
+    cmd_line_parser : argparse.ArgumentParser
+        The command line parser object to use.
+    """
+    pandoc_path = cmd_line_args.pandoc_exe
+
+    if isinstance(cmd_line_args.files, list):
+        path_list = cmd_line_args.files
+    else:
+        path_list = [cmd_line_args.files]
+        convert_single_file(
+            path=cmd_line_args.files,
+            out_path=cmd_line_args.out_path,
+            pandoc=pandoc_path,
+        )
+
+    out_path = cmd_line_args.out_path
+
+    if path.basename(out_path) == "" or path.isdir(out_path):
+        print("Output to directory {dir}".format(dir=out_path))
+    else:
+        print("Output to file {file}".format(file=out_path))
+
+    for arg_path in path_list:
+        if path.isdir(arg_path):
+            for dirpath, _, filenames in walk(
+                top=arg_path, topdown=True, followlinks=True
+            ):
+                for file in filenames:
+                    file_object = PurePath(file)
+                    if file_object.suffix == ".md":
+                        in_file = path.join(dirpath, file)
+                        out_file = path.join(out_path, file_object.with_suffix(".org"))
+                        convert_single_file(
+                            path=in_file,
+                            out_path=out_file,
+                            pandoc=pandoc_path,
+                        )
+
+        elif path.isfile(arg_path):
+            convert_single_file(path=arg_path, out_path=out_path, pandoc=pandoc_path)
+        else:
+            cmd_line_parser.print_help()
+            cmd_line_parser.error(
+                "no markdown files found in path '{path}'".format(path=arg_path)
+            )
