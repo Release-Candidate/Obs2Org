@@ -12,6 +12,9 @@ to Org-Mode files.
 from __future__ import annotations
 
 import subprocess  # nosec B404
+from pathlib import Path
+
+from obs2org.parse_org_mode import correct_org_mode_file
 
 
 ###############################################################################
@@ -37,13 +40,15 @@ def convert_single_file(path: str, out_path: str, pandoc: str) -> None:
     )
     try:
         run_pandoc(in_file=path, out_path=out_path, pandoc=pandoc)
-
-    except Exception as excp:
+        correct_org_mode(out_path)
+    except subprocess.SubprocessError as excp:
         print(
-            "Error '{err}' converting file '{in_path}' to '{out_path}'".format(
+            "{err} converting file '{in_path}' to '{out_path}'\n".format(
                 err=excp, in_path=path, out_path=out_path
             )
         )
+    else:
+        print("OK\n")
 
 
 ###############################################################################
@@ -79,8 +84,40 @@ def run_pandoc(in_file: str, out_path: str, pandoc: str) -> None:
         ],
         check=False,
         shell=True,
+        text=True,
         capture_output=True,
     )
 
-    if pandoc_out.returncode != 0:
-        print("Pandoc error: '{err}'".format(err=pandoc_out.stderr.decode()))
+    if pandoc_out.returncode != 0 and pandoc_out.stderr is not None:
+        raise subprocess.SubprocessError(
+            "Pandoc error: '{err}'".format(err=pandoc_out.stderr.strip("\n"))
+        )
+
+
+###############################################################################
+def correct_org_mode(out_path: str) -> None:
+    """Correct internal links, tags and dates in the generated Org-Mode file.
+
+    Parse the generated Org-Mode file with path `out_path` and correct
+    internal links, tags and dates in this file.
+
+    Parameters
+    ----------
+    out_path : str
+        The path to the generated Org-Mode file to correct.
+
+    """
+    in_file = Path(out_path)
+
+    tmp_file = Path(out_path + "~")
+    try:
+        with in_file.open(mode="r", encoding="utf-8") as fd:
+            file_text = fd.read()
+            new_text = correct_org_mode_file(file_text, in_file.parent)
+        with tmp_file.open(mode="w", encoding="utf-8") as tmp:
+            tmp.write(new_text)
+
+        tmp_file.replace(out_path)
+
+    except FileNotFoundError as excp:
+        print("ERR {err}".format(err=excp))
