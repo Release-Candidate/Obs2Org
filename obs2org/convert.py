@@ -61,11 +61,12 @@ def run_pandoc(in_file: str, out_path: str, pandoc: str) -> None:
     Parameters
     ----------
     in_file : str
-        Path to the markdown file to covnert.
+        Path to the markdown file to convert.
     out_path : str
         Path to the Org-Mode file to generate.
     pandoc : str
-        Path to the pandoc executable or the name of the executable if it is in the PATH.
+        Path to the pandoc executable or the name of the executable if it is
+        in the PATH.
     """
     pandoc_out = subprocess.run(
         args=[
@@ -111,8 +112,8 @@ def correct_org_mode(out_path: str) -> None:
 
     tmp_file = Path(out_path + "~")
     try:
-        with in_file.open(mode="r", encoding="utf-8") as fd:
-            file_text = fd.read()
+        with in_file.open(mode="r", encoding="utf-8") as f_d:
+            file_text = f_d.read()
             new_text = correct_org_mode_file(file_text, in_file.parent)
         with tmp_file.open(mode="w", encoding="utf-8") as tmp:
             tmp.write(new_text)

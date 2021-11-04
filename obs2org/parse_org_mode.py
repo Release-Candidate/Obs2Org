@@ -5,9 +5,9 @@
 # File:     parse_org_mode.py
 # Date:     02.11.2021
 # ===============================================================================
-"""Parses a generated Org-Mode file and corrects the links to headers/seactions
-in other Org-Mode files, convert tags to Org-Mode tags and put dates on a line in
-angle brackets.
+"""Parses a generated Org-Mode file and corrects the links to headers/sections
+in other Org-Mode files, convert tags to Org-Mode tags and put dates on a line
+in angle brackets.
 """
 
 from __future__ import annotations
@@ -45,7 +45,8 @@ _tag_remove_special_regex = re.compile(r"[^\w:]")
 
 ###############################################################################
 def correct_org_mode_file(text: str, directory: Path) -> str:
-    """Parse Org-Mode formatted text and correct wiki-style links, tags and date strings.
+    """Parse Org-Mode formatted text and correct wiki-style links, tags and
+    date strings.
 
     Corrects wiki-style links to headings in other Org-Mode files,
     corrects hash-tags to Org-Mode tags and adds angle brackets to
@@ -63,9 +64,9 @@ def correct_org_mode_file(text: str, directory: Path) -> str:
     str
         Returns the corrected Org-Mode text.
     """
-    correcteg_tags = _correct_org_mode_tags(text=text)
-    corrected_dates = _correct_org_mode_date(text=correcteg_tags)
-    corrected_links = _correct_org_mode_links(text=corrected_dates, dir=directory)
+    corrected_tags = _correct_org_mode_tags(text=text)
+    corrected_dates = _correct_org_mode_date(text=corrected_tags)
+    corrected_links = _correct_org_mode_links(text=corrected_dates, directory=directory)
     return corrected_links
 
 
@@ -131,7 +132,7 @@ def _correct_org_mode_date(text: str) -> str:
 
 
 ###############################################################################
-def _correct_org_mode_links(text: str, dir: Path) -> str:
+def _correct_org_mode_links(text: str, directory: Path) -> str:
     """Correct wiki-style links in the Org-Mode text.
 
     Search for links to headings in other Org-Mode files and replace
@@ -141,7 +142,7 @@ def _correct_org_mode_links(text: str, dir: Path) -> str:
     ----------
     text : str
         The Org-Mode text to parse and correct.
-    dir : Path
+    directory : Path
         The directory the Org-Mode files to link to are located in.
 
     Returns
@@ -155,7 +156,9 @@ def _correct_org_mode_links(text: str, dir: Path) -> str:
     `[[file:books.org::#my-heading][My Heading]]`.
     """
     return _internal_wikilink_regexp.sub(
-        repl=lambda match_obj: _link_replace_func(match_obj=match_obj, dir=dir),
+        repl=lambda match_obj: _link_replace_func(
+            match_obj=match_obj, directory=directory
+        ),
         string=text,
     )
 
@@ -185,8 +188,9 @@ def _tag_replace_func(match_obj: Match[str]) -> str:
 
 
 ###############################################################################
-def _link_replace_func(match_obj: Match[str], dir: Path) -> str:
-    """Search for the Org-Mode id of the given heading and replace that in the link.
+def _link_replace_func(match_obj: Match[str], directory: Path) -> str:
+    """Search for the Org-Mode id of the given heading and replace that in
+    the link.
 
     Open the file the link points to and search the id of the
     given heading and the real name of the heading. Replace the
@@ -198,7 +202,7 @@ def _link_replace_func(match_obj: Match[str], dir: Path) -> str:
     match_obj : Match[str]
         The `Match` object holding the filename and the heading
         name without special characters.
-    dir : Path
+    directory : Path
         The directory the Org-Mode files to link to are located in.
 
     Returns
@@ -207,7 +211,7 @@ def _link_replace_func(match_obj: Match[str], dir: Path) -> str:
         The working link to the heading in the file with the real
         heading as link title.
     """
-    file_name: Path = dir / Path(match_obj.group(1) + ".org")
+    file_name: Path = directory / Path(match_obj.group(1) + ".org")
     heading_name = match_obj.group(2)
     header_link = ""
     try:
@@ -250,8 +254,8 @@ def _parse_linkedfile(file_name: Path, heading_name: str) -> Tuple[str, str]:
         string=heading_name, repl=r"[\\W]{1,}", pattern=r"^|\s|$"
     )
 
-    with file_name.open(mode="r", encoding="utf-8") as fd:
-        file_text = fd.read()
+    with file_name.open(mode="r", encoding="utf-8") as f_d:
+        file_text = f_d.read()
         header_link, heading_name = _parse_text_for_heading(
             text=file_text,
             file_name=file_name,
@@ -266,14 +270,15 @@ def _parse_linkedfile(file_name: Path, heading_name: str) -> Tuple[str, str]:
 def _parse_text_for_heading(
     text: str, heading_name_regexp: str, heading_name: str, file_name: Path
 ) -> Tuple[str, str]:
-    """Parse the Org-Mode text `text` for the heading and return it's id and name.
+    """Parse the Org-Mode text `text` for the heading and return it's id and
+    name.
 
     Parameters
     ----------
     text : str
         The Org-Mode text to parse.
     heading_name_regexp : str
-        The rexept with which to search for the heading
+        The regexp with which to search for the heading
     heading_name : str
         The name of the heading to search for.
     file_name : Path

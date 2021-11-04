@@ -153,7 +153,7 @@ def convert_files(
     pandoc_path = cmd_line_args.pandoc_exe
 
     if isinstance(cmd_line_args.files, list):
-        path_list = cmd_line_args.files
+        path_list: list[str] = cmd_line_args.files
     else:
         path_list = [cmd_line_args.files]
         convert_single_file(

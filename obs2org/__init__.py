@@ -5,6 +5,7 @@
 # File:     __init__.py
 #
 ###############################################################################
+"""Main module file holding global constants like the program's version."""
 
 from __future__ import annotations
 
