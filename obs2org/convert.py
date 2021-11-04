@@ -120,4 +120,4 @@ def correct_org_mode(out_path: str) -> None:
         tmp_file.replace(out_path)
 
     except FileNotFoundError as excp:
-        print("ERR {err}".format(err=excp))
+        print("Error, a file has not been found. '{err}'".format(err=excp))
