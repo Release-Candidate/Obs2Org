@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import argparse
+import subprocess  # nosec
 from os import path, walk
 from pathlib import Path, PurePath
 from typing import NamedTuple
@@ -18,6 +19,7 @@ from obs2org import VERSION
 from obs2org.convert import convert_single_file, correct_org_mode
 
 
+################################################################################
 class FilePaths(NamedTuple):
     """Class holding the path to the Markdown file to convert and the path to the
     Org-Mode file to generate.
@@ -69,13 +71,13 @@ See website https://github.com/Release-Candidate/Obs2Org for details."""
 ################################################################################
 def main() -> None:
     """The program's main entry point."""
-    cmd_line_args, cmd_line_parser = parse_command_line()
+    cmd_line_args, cmd_line_parser = _parse_command_line()
 
     _convert_files(cmd_line_args=cmd_line_args, cmd_line_parser=cmd_line_parser)
 
 
 ###############################################################################
-def parse_command_line() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
+def _parse_command_line() -> tuple[argparse.Namespace, argparse.ArgumentParser]:
     """Parses the command line arguments of the program.
 
     Returns a tuple containing a `Namespace` object holding all
@@ -163,42 +165,154 @@ def _convert_files(
     cmd_line_parser : argparse.ArgumentParser
         The command line parser object to use.
     """
-    pandoc_path = cmd_line_args.pandoc_exe
+    pandoc_path: str = _check_pandoc(
+        cmd_line_args=cmd_line_args, cmd_line_parser=cmd_line_parser
+    )
 
     if isinstance(cmd_line_args.files, list):
         path_list: list[str] = cmd_line_args.files
     else:
         path_list = [cmd_line_args.files]
 
-    out_path = _check_out_path(cmd_line_args, cmd_line_parser, path_list)
+    out_path = _check_out_path(
+        cmd_line_args=cmd_line_args,
+        cmd_line_parser=cmd_line_parser,
+        path_list=path_list,
+    )
 
     list_of_files: list[FilePaths] = []
 
     for arg_path in path_list:
-        if path.isdir(arg_path):
-            for dirpath, _, filenames in walk(
-                top=arg_path, topdown=True, followlinks=True
-            ):
-                for file in filenames:
-                    file_object = PurePath(file)
-                    if file_object.suffix == ".md":
-                        in_file = path.join(dirpath, file)
-                        out_file = path.join(out_path, file_object.with_suffix(".org"))
-                        list_of_files.append(
-                            FilePaths(in_file=Path(in_file), out_file=Path(out_file))
-                        )
-
-        elif path.isfile(arg_path):
-            file_obj = Path(arg_path)
-            out_file = path.join(out_path, file_obj.with_suffix(".org"))
-            list_of_files.append(FilePaths(in_file=file_obj, out_file=Path(out_file)))
-        else:
-            cmd_line_parser.print_help()
-            cmd_line_parser.error(
-                "no markdown files found at path '{path}'".format(path=arg_path)
-            )
+        paths = _check_in_path(
+            cmd_line_parser=cmd_line_parser,
+            out_path=out_path,
+            arg_path=arg_path,
+        )
+        list_of_files.extend(paths)
 
     _do_convert_files(pandoc_path=pandoc_path, list_of_files=list_of_files)
+
+
+################################################################################
+def _check_pandoc(
+    cmd_line_args: argparse.Namespace,
+    cmd_line_parser: argparse.ArgumentParser,
+) -> str:
+    """Check if the given command to call Pandoc works.
+
+    If the command does not work, the program is exited with an error message.
+
+    Parameters
+    ----------
+    cmd_line_args : argparse.Namespace
+        The object holding all command line arguments, the pandoc command too.
+    cmd_line_parser : argparse.ArgumentParser
+        The command line parser object to use.
+
+    Returns
+    -------
+    str
+        The command to call the Pandoc executable on success.
+    """
+    pandoc = cmd_line_args.pandoc_exe
+
+    pandoc_version_arg = "--version"
+
+    pandoc_out = subprocess.run(
+        args=[pandoc, pandoc_version_arg],
+        check=False,
+        shell=True,
+        text=True,
+        capture_output=True,
+    )
+
+    if pandoc_out.returncode != 0 and pandoc_out.stderr is not None:
+        cmd_line_parser.print_help()
+        cmd_line_parser.error(
+            "Pandoc executable '{pandoc}' not found or does not work!\n"
+            "Error message: '{error}'\n"
+            "Look at https://pandoc.org/installing.html for information on how to install\n"
+            "pandoc".format(pandoc=pandoc, error=pandoc_out.stderr.strip())
+        )
+
+    return pandoc
+
+
+################################################################################
+def _check_in_path(
+    cmd_line_parser: argparse.ArgumentParser,
+    out_path: str,
+    arg_path: str,
+) -> list[FilePaths]:
+    """Check, if the given path contains Markdown files and return the path to
+    them and the Org-Mode file to generate.
+    Return the empty list else.
+
+    Parameters
+    ----------
+    cmd_line_parser : argparse.ArgumentParser
+        The command line parser object to use.
+    out_path : str
+        The path to write the generated Org-Mode files to.
+    arg_path : str
+        The path to check for Markdown files.
+
+    Returns
+    -------
+    list[FilePaths]
+        The `FilePaths` of the Markdown file to convert and the Org-Mode file
+        to generate.
+    """
+    ret_list: list[FilePaths] = []
+
+    if path.isdir(arg_path):
+        dir_path_list = _walk_directory(out_path=out_path, arg_path=arg_path)
+        ret_list.extend(dir_path_list)
+
+    elif path.isfile(arg_path):
+        file_obj = Path(arg_path)
+        out_file = path.join(out_path, file_obj.with_suffix(".org"))
+        ret_list.append(FilePaths(in_file=file_obj, out_file=Path(out_file)))
+
+    else:
+        cmd_line_parser.print_help()
+        cmd_line_parser.error(
+            "no markdown files found at path '{path}'".format(path=arg_path)
+        )
+
+    return ret_list
+
+
+################################################################################
+def _walk_directory(out_path: str, arg_path: str) -> list[FilePaths]:
+    """Walk through the directory `arg_path` and add all Markdown files to the
+    list of files to convert.
+
+    Parameters
+    ----------
+    out_path : str
+        The path to write the generated Org-Mode files to.
+    arg_path : str
+        The directory to search for Markdown files.
+
+    Returns
+    -------
+    list[FilePaths]
+        A list of found Markdown files and the paths to the Org-Mode file to
+        generate.
+    """
+    ret_list: list[FilePaths] = []
+    for dirpath, _, filenames in walk(top=arg_path, topdown=True, followlinks=True):
+        for file in filenames:
+            file_object = PurePath(file)
+            if file_object.suffix == ".md":
+                in_file = path.join(dirpath, file)
+                out_file = path.join(out_path, file_object.with_suffix(".org"))
+                ret_list.append(
+                    FilePaths(in_file=Path(in_file), out_file=Path(out_file))
+                )
+
+    return ret_list
 
 
 ################################################################################

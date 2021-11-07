@@ -90,7 +90,7 @@ def run_pandoc(in_file: Path, out_path: Path, pandoc: str) -> None:
 
     if pandoc_out.returncode != 0 and pandoc_out.stderr is not None:
         raise subprocess.SubprocessError(
-            "Pandoc error: '{err}'".format(err=pandoc_out.stderr.strip("\n"))
+            "Pandoc error: '{err}'".format(err=pandoc_out.stderr.strip())
         )
 
 
