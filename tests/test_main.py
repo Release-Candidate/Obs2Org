@@ -131,7 +131,7 @@ def test_convert_test1(capsys: pytest.CaptureFixture[str]) -> None:
 ################################################################################
 def test_convert_test2(capsys: pytest.CaptureFixture[str]) -> None:
     """Test conversion of `fixture/test1.md` and `fixture/test2.md`."""
-    run_obs2org(["./tests/fixtures/", "-o test_out/"])
+    run_obs2org(["./tests/fixtures/", "-o=test_out/"])
 
     captured = capsys.readouterr()
     assert captured.err == ""  # nosec
