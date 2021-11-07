@@ -19,14 +19,16 @@ import sys
 
 if sys.version_info.major < 3 or sys.version_info.minor < 8:
     print(
-        "ERROR: Python version is too old, I need at least Python 3.8, this has a version of {version}".format(
-            version=platform.python_version()
-        ),
+        "ERROR: Python version is too old, I need at least Python 3.8,"
+        " this has a version of {version}".format(version=platform.python_version()),
         file=sys.stderr,
     )
     sys.exit(1)
 
+
 if __name__ == "__main__":
+    from asyncio import run
+
     from obs2org import main
 
-    main.main()
+    run(main.main())

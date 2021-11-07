@@ -10,10 +10,11 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import subprocess  # nosec
 from os import path, walk
 from pathlib import Path, PurePath
-from typing import NamedTuple
+from typing import Coroutine, NamedTuple
 
 from obs2org import VERSION
 from obs2org.convert import convert_single_file, correct_org_mode
@@ -69,11 +70,11 @@ See website https://github.com/Release-Candidate/Obs2Org for details."""
 
 
 ################################################################################
-def main() -> None:
+async def main() -> None:
     """The program's main entry point."""
     cmd_line_args, cmd_line_parser = _parse_command_line()
 
-    _convert_files(cmd_line_args=cmd_line_args, cmd_line_parser=cmd_line_parser)
+    await _convert_files(cmd_line_args=cmd_line_args, cmd_line_parser=cmd_line_parser)
 
 
 ###############################################################################
@@ -150,7 +151,7 @@ converted files to.""",
 
 
 ###############################################################################
-def _convert_files(
+async def _convert_files(
     cmd_line_args: argparse.Namespace, cmd_line_parser: argparse.ArgumentParser
 ) -> None:
     """Convert the markdown files to Org-Mode files.
@@ -190,7 +191,7 @@ def _convert_files(
         )
         list_of_files.extend(paths)
 
-    _do_convert_files(pandoc_path=pandoc_path, list_of_files=list_of_files)
+    await _do_convert_files(pandoc_path=pandoc_path, list_of_files=list_of_files)
 
 
 ################################################################################
@@ -351,16 +352,15 @@ def _check_out_path(
         if len(path_list) <= 1:
             cmd_line_parser.print_help()
             cmd_line_parser.error(
-                "more than one markdown file to convert given, but just one output file '{path}'!".format(
-                    path=out_path
-                )
+                "more than one markdown file to convert given,"
+                "but just one output file '{path}'!".format(path=out_path)
             )
 
     return out_path
 
 
 ################################################################################
-def _do_convert_files(pandoc_path: str, list_of_files: list[FilePaths]) -> None:
+async def _do_convert_files(pandoc_path: str, list_of_files: list[FilePaths]) -> None:
     """Converts the files in the given list.
 
     First converts the files in `list_of_files` using pandoc and then fixes the
@@ -377,11 +377,20 @@ def _do_convert_files(pandoc_path: str, list_of_files: list[FilePaths]) -> None:
         List of `FilePaths` containing the path to the Markdown file to convert
         and the Org-Mode file to generate.
     """
+    convert_tasks: list[Coroutine[object, object, object]] = []
     for convert_file in list_of_files:
-        convert_single_file(
-            path=convert_file.in_file,
-            out_path=convert_file.out_file,
-            pandoc=pandoc_path,
+        convert_tasks.append(
+            asyncio.to_thread(
+                convert_single_file,
+                convert_file.in_file,
+                convert_file.out_file,
+                pandoc_path,
+            )
         )
+
+    await asyncio.gather(*convert_tasks)
+
+    # Can't run this asynchronously, as
+    #
     for correct_file in list_of_files:
         correct_org_mode(correct_file.out_file)
