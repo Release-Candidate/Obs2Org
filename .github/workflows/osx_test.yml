@@ -50,7 +50,9 @@ jobs:
 
       - name: Install dependencies using pipenv ${{ matrix.python-version }}
         run: |
-          cd $GITHUB_WORKSPACE && python -m pipenv install --dev
+          cd $GITHUB_WORKSPACE
+          python -m pipenv install --dev
+          brew install pandoc
 
       - name: Run Tests ${{ matrix.python-version }}
         run: |
@@ -109,6 +111,7 @@ jobs:
           python -m pipenv install --dev
           python -m pipenv install obs2org
           python -m pipenv update
+          brew install pandoc
 
       - name: Run Tests ${{ matrix.python-version }}
         run: |

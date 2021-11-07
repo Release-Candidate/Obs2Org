@@ -49,7 +49,9 @@ jobs:
         run: python -m pip install --upgrade pipenv
 
       - name: Install dependencies using pipenv ${{ matrix.python-version }}
-        run: python -m pipenv install --dev
+        run: |
+          python -m pipenv install --dev
+          choco install pandoc
 
       # - name: Check if Working ${{ matrix.python-version }}
       #   shell: cmd
@@ -88,7 +90,9 @@ jobs:
             windows-2019-${{ matrix.python-version }}-pip-
 
       - name: Install obs2org package ${{ matrix.python-version }}
-        run: python -m pip install --upgrade
+        run: |
+          python -m pip install --upgrade
+          choco install pandoc
 
       - name: Delete Source ${{ matrix.python-version }}
         run: |

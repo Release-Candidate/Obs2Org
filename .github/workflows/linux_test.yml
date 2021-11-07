@@ -52,6 +52,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           python -m pipenv install --dev
+          sudo apt-get install pandoc -y
 
       - name: Run Tests ${{ matrix.python-version }}
         run: |
@@ -111,6 +112,7 @@ jobs:
           python -m pipenv install --dev
           python -m pipenv install obs2org
           python -m pipenv update
+          sudo apt-get install pandoc -y
 
       - name: Run Tests ${{ matrix.python-version }}
         run: |
