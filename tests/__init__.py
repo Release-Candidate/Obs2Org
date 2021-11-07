@@ -5,5 +5,6 @@
 # File:     __init__.py
 #
 ###############################################################################
+"""Test module file."""
 
 from __future__ import annotations
