@@ -11,10 +11,23 @@ from __future__ import annotations
 
 import argparse
 from os import path, walk
-from pathlib import PurePath
+from pathlib import Path, PurePath
+from typing import NamedTuple
 
 from obs2org import VERSION
-from obs2org.convert import convert_single_file
+from obs2org.convert import convert_single_file, correct_org_mode
+
+
+class FilePaths(NamedTuple):
+    """Class holding the path to the Markdown file to convert and the path to the
+    Org-Mode file to generate.
+    """
+
+    in_file: Path
+    """Path to the Markdown file to convert."""
+    out_file: Path
+    """Path to the generated Org-Mode file."""
+
 
 __descriptionText: str = (
     """Converts markdown formatted files to Org-Mode formatted files using Pandoc."""
@@ -58,7 +71,7 @@ def main() -> None:
     """The program's main entry point."""
     cmd_line_args, cmd_line_parser = parse_command_line()
 
-    convert_files(cmd_line_args=cmd_line_args, cmd_line_parser=cmd_line_parser)
+    _convert_files(cmd_line_args=cmd_line_args, cmd_line_parser=cmd_line_parser)
 
 
 ###############################################################################
@@ -135,7 +148,7 @@ converted files to.""",
 
 
 ###############################################################################
-def convert_files(
+def _convert_files(
     cmd_line_args: argparse.Namespace, cmd_line_parser: argparse.ArgumentParser
 ) -> None:
     """Convert the markdown files to Org-Mode files.
@@ -156,18 +169,10 @@ def convert_files(
         path_list: list[str] = cmd_line_args.files
     else:
         path_list = [cmd_line_args.files]
-        convert_single_file(
-            path=cmd_line_args.files,
-            out_path=cmd_line_args.out_path,
-            pandoc=pandoc_path,
-        )
 
-    out_path = cmd_line_args.out_path
+    out_path = _check_out_path(cmd_line_args, cmd_line_parser, path_list)
 
-    if path.basename(out_path) == "" or path.isdir(out_path):
-        print("Output to directory {dir}".format(dir=out_path))
-    else:
-        print("Output to file {file}".format(file=out_path))
+    list_of_files: list[FilePaths] = []
 
     for arg_path in path_list:
         if path.isdir(arg_path):
@@ -179,16 +184,90 @@ def convert_files(
                     if file_object.suffix == ".md":
                         in_file = path.join(dirpath, file)
                         out_file = path.join(out_path, file_object.with_suffix(".org"))
-                        convert_single_file(
-                            path=in_file,
-                            out_path=out_file,
-                            pandoc=pandoc_path,
+                        list_of_files.append(
+                            FilePaths(in_file=Path(in_file), out_file=Path(out_file))
                         )
 
         elif path.isfile(arg_path):
-            convert_single_file(path=arg_path, out_path=out_path, pandoc=pandoc_path)
+            file_obj = Path(arg_path)
+            out_file = path.join(out_path, file_obj.with_suffix(".org"))
+            list_of_files.append(FilePaths(in_file=file_obj, out_file=Path(out_file)))
         else:
             cmd_line_parser.print_help()
             cmd_line_parser.error(
-                "no markdown files found in path '{path}'".format(path=arg_path)
+                "no markdown files found at path '{path}'".format(path=arg_path)
             )
+
+    _do_convert_files(pandoc_path=pandoc_path, list_of_files=list_of_files)
+
+
+################################################################################
+def _check_out_path(
+    cmd_line_args: argparse.Namespace,
+    cmd_line_parser: argparse.ArgumentParser,
+    path_list: list[str],
+) -> str:
+    """Validate the path to write the Org-Mode file(s) to and return the checked
+    path.
+    If the path is wrong, e.g. a path to a file for more than one Markdown file
+    to convert, the program exits with an error message.
+
+    Parameters
+    ----------
+    cmd_line_args : argparse.Namespace
+        The object holding the command line arguments.
+    cmd_line_parser : argparse.ArgumentParser
+        The command line parser object.
+    path_list : list[str]
+        The list of paths to Markdown files to convert.
+
+    Returns
+    -------
+    str
+        The checked path to the Org-Mode file(s) on success, exits the program
+        on errors.
+    """
+    out_path: str = cmd_line_args.out_path
+
+    if path.basename(out_path) == "" or path.isdir(out_path):
+        print("Output to directory {dir}".format(dir=out_path))
+        Path(out_path).mkdir(exist_ok=True, parents=True)
+    else:
+        print("Output to file {file}".format(file=out_path))
+        if len(path_list) <= 1:
+            cmd_line_parser.print_help()
+            cmd_line_parser.error(
+                "more than one markdown file to convert given, but just one output file '{path}'!".format(
+                    path=out_path
+                )
+            )
+
+    return out_path
+
+
+################################################################################
+def _do_convert_files(pandoc_path: str, list_of_files: list[FilePaths]) -> None:
+    """Converts the files in the given list.
+
+    First converts the files in `list_of_files` using pandoc and then fixes the
+    links to other Org-Mode files and tags and dates.
+    We have to do the conversion first, because links that need to be corrected
+    can point to files not generated yet and we must search the files the link
+    points to for the right section id.
+
+    Parameters
+    ----------
+    pandoc_path : str
+        Path to the pandoc executable.
+    list_of_files : list[FilePaths]
+        List of `FilePaths` containing the path to the Markdown file to convert
+        and the Org-Mode file to generate.
+    """
+    for convert_file in list_of_files:
+        convert_single_file(
+            path=convert_file.in_file,
+            out_path=convert_file.out_file,
+            pandoc=pandoc_path,
+        )
+    for correct_file in list_of_files:
+        correct_org_mode(correct_file.out_file)

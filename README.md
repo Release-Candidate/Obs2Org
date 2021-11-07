@@ -1,7 +1,5 @@
 # Obs2Org
 
-
-
 Set CODECOV_SECRET to the Codecov token.
 
 Set PIP_TOKEN to the PyPI token.
@@ -12,7 +10,6 @@ Set PIP_TOKEN to the PyPI token.
 [![Read The Docs badge](https://readthedocs.org/projects/obs2org/badge/?version=latest)](https://obs2org.readthedocs.io/en/latest/?badge=latest)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [more badges](#badges)
-
 
 ## Development
 
