@@ -10,4 +10,4 @@
 :: pytest --hypothesis-show-statistics --no-cov
 
 :: Running the tests using 12 processes.
-pytest --hypothesis-show-statistics --no-cov -n 12
+pytest --hypothesis-show-statistics --cov=./ --cov-report=xml -n 12

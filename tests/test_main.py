@@ -8,6 +8,7 @@
 # ==============================================================================
 """Test Obs2Org by executing the program's main function with various arguments."""
 
+import filecmp
 import runpy
 import sys
 from typing import List
@@ -75,3 +76,95 @@ def test_show_help(capsys: pytest.CaptureFixture[str]) -> None:
     captured = capsys.readouterr()
     assert captured.err == ""  # nosec
     assert captured.out.find("usage: python -m obs2org [-h] [-V]") == 0  # nosec
+
+
+################################################################################
+def test_illegal_markdown() -> None:
+    """Test an illegal markdown input path."""
+    with pytest.raises(expected_exception=SystemExit) as excp:
+        run_obs2org(["./does_not_exist/"])
+    assert excp.value.args[0] == 2  # nosec
+
+
+################################################################################
+def test_illegal_org_mode() -> None:
+    """Test an illegal Org-Mode output file."""
+    with pytest.raises(expected_exception=SystemExit) as excp:
+        run_obs2org(["-o ./does_not_exist.org"])
+    assert excp.value.args[0] == 2  # nosec
+
+
+################################################################################
+def test_illegal_pandoc() -> None:
+    """Test an illegal pandoc command."""
+    with pytest.raises(expected_exception=SystemExit) as excp:
+        run_obs2org(["-p does_not_exist"])
+    assert excp.value.args[0] == 2  # nosec
+
+
+################################################################################
+def test_convert_test1(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test conversion of `fixture/test1.md`."""
+    run_obs2org(["./tests/fixtures/test1.md", "-o", "test_out/"])
+
+    captured = capsys.readouterr()
+    assert captured.err == ""  # nosec
+    assert captured.out.find("OK") > 1  # nosec
+    assert (  # nosec
+        filecmp.cmp(
+            "./test_out/test1.org",
+            "./tests/fixtures/test1_orig.org",
+            shallow=False,
+        )
+        is True
+    )
+    assert (  # nosec
+        filecmp.cmp(
+            "./test_out/test1.org",
+            "./tests/fixtures/test1_fails.org",
+            shallow=False,
+        )
+        is False
+    )
+
+
+################################################################################
+def test_convert_test2(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test conversion of `fixture/test1.md` and `fixture/test2.md`."""
+    run_obs2org(["./tests/fixtures/", "-o", "test_out/"])
+
+    captured = capsys.readouterr()
+    assert captured.err == ""  # nosec
+    assert captured.out.find("OK") > 1  # nosec
+    assert (  # nosec
+        filecmp.cmp(
+            "./test_out/test1.org",
+            "./tests/fixtures/test1_orig.org",
+            shallow=False,
+        )
+        is True
+    )
+    assert (  # nosec
+        filecmp.cmp(
+            "./test_out/test1.org",
+            "./tests/fixtures/test1_fails.org",
+            shallow=False,
+        )
+        is False
+    )
+    assert (  # nosec
+        filecmp.cmp(
+            "./test_out/test2.org",
+            "./tests/fixtures/test2_orig.org",
+            shallow=False,
+        )
+        is True
+    )
+    assert (  # nosec
+        filecmp.cmp(
+            "./test_out/test2.org",
+            "./tests/fixtures/test2_fails.org",
+            shallow=False,
+        )
+        is False
+    )

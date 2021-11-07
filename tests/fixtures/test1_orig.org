@@ -1,0 +1,27 @@
+#+title: Bücher
+
+* Bücher
+  :PROPERTIES:
+  :CUSTOM_ID: bücher
+  :END:
+** Computer / Programming
+   :PROPERTIES:
+   :CUSTOM_ID: computer-programming
+   :END:
+*** Most influential books on Computer Science/programming			:Book:Programming:Liste:
+    :PROPERTIES:
+    :CUSTOM_ID: most-influential-books-on-computer-scienceprogramming
+    :END:
+<2021-10-08>
+Eine liste der einflussreichsten Bücher über Programmierung [[https://github.com/cs-books/influential-cs-books][Most influential books on Computer Science/programming]]
+
+*** Allgemein
+    :PROPERTIES:
+    :CUSTOM_ID: allgemein
+    :END:
+**** Documentation System			:Documentation:Programming:Book:
+     :PROPERTIES:
+     :CUSTOM_ID: documentation-system
+     :END:
+<2021-10-22>
+*Daniele Procida*: /Documentation system/ Wie man die 4 Typen der Dokumentation - Tutorials, How-Tos, Explanations und References - als Software Entwickler schreibt und was es zu beachten gibt. Online: [[https://documentation.divio.com/][The documentation system --- Documentation system documentation]]

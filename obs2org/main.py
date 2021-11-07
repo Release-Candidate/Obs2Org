@@ -272,7 +272,7 @@ def _check_in_path(
 
     elif path.isfile(arg_path):
         file_obj = Path(arg_path)
-        out_file = path.join(out_path, file_obj.with_suffix(".org"))
+        out_file = path.join(out_path, file_obj.with_suffix(".org").name)
         ret_list.append(FilePaths(in_file=file_obj, out_file=Path(out_file)))
 
     else:

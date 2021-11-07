@@ -5,6 +5,8 @@
 		}
 	],
 	"settings": {
-		"autoDocstring.docstringFormat": "numpy"
+		"autoDocstring.docstringFormat": "numpy",
+		"coverage-gutters.coverageBaseDir": "./",
+		"coverage-gutters.xmlname": "coverage.xml"
 	}
 }
