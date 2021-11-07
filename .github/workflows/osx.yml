@@ -60,7 +60,7 @@ jobs:
       - name: Run obs2org ${{ matrix.python-version }}
         run: |
           cd $GITHUB_WORKSPACE
-          pipenv run python -m obs2org -y
+          pipenv run python -m obs2org --version
 
       # - uses: actions/upload-artifact@v2
       #  if: ${{ always() }}
@@ -103,7 +103,7 @@ jobs:
       - name: Run obs2org Pkg ${{ matrix.python-version }}
         run: |
           cd $GITHUB_WORKSPACE
-          python -m obs2org -y
+          python -m obs2org --version
 
       # - uses: actions/upload-artifact@v2
       #  if: ${{ always() }}
