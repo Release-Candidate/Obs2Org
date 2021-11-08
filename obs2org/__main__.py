@@ -17,9 +17,9 @@ from __future__ import print_function
 import platform
 import sys
 
-if sys.version_info.major < 3 or sys.version_info.minor < 8:
+if sys.version_info.major < 3 or sys.version_info.minor < 9:
     print(
-        "ERROR: Python version is too old, I need at least Python 3.8,"
+        "ERROR: Python version is too old, I need at least Python 3.9,"
         " this has a version of {version}".format(version=platform.python_version()),
         file=sys.stderr,
     )
