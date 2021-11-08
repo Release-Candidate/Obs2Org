@@ -220,7 +220,7 @@ def _check_pandoc(
     pandoc_version_arg = "--version"
 
     pandoc_out = subprocess.run(
-        args=[pandoc, pandoc_version_arg],
+        args=" ".join([pandoc, pandoc_version_arg]),
         check=False,
         shell=True,
         text=True,

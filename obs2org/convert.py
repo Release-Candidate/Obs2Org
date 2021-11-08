@@ -67,23 +67,24 @@ def run_pandoc(in_file: Path, out_path: Path, pandoc: str) -> None:
         Path to the pandoc executable or the name of the executable if it is
         in the PATH.
     """
+    args: list[str] = [
+        pandoc,
+        str(in_file),
+        "-f",
+        "markdown",
+        "-t",
+        "org",
+        "-s",
+        "--eol=lf",
+        "--toc",
+        "--wrap=none",
+        "-o",
+        str(out_path),
+    ]
     pandoc_out = subprocess.run(
-        args=[
-            pandoc,
-            in_file,
-            "-f",
-            "markdown",
-            "-t",
-            "org",
-            "-s",
-            "--eol=lf",
-            "--toc",
-            "--wrap=none",
-            "-o",
-            out_path,
-        ],
+        args=args,
         check=False,
-        shell=True,
+        shell=False,  # nosec
         text=True,
         capture_output=True,
     )
