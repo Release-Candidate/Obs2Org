@@ -4,6 +4,10 @@ on:
   release:
     types: [created]
 
+  push:
+    tags:
+      - "v*.*.*"
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -47,10 +51,30 @@ jobs:
           cd $GITHUB_WORKSPACE
           cd ./obs2org/doc && pipenv run make html
 
+      - uses: olegtarasov/get-tag@v2.1
+        id: tagName
+        with:
+          tagRegex: "v(.*)"
+
       - name: Build Package
         run: |
           cd $GITHUB_WORKSPACE
           pipenv run python -m build
+
+      - name: Generate Changelog
+        run: |
+          cd $GITHUB_WORKSPACE/scripts
+          ./get_changelog.sh > ../first_changelog.md
+
+      - name: Release to GitHub
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: Version ${{ env.GIT_TAG_NAME }}
+          body_path: first_changelog.md
+          files: ./dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload
         env:
