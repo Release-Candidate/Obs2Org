@@ -1,3 +1,5 @@
 # Obs2Org Changelog
 
-## Version 0.9.0 (2021-10-25)
+## Version 0.9.0 (2021-11-09)
+
+First release
