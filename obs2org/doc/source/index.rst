@@ -14,6 +14,7 @@ Obs2Org
    :maxdepth: 8
    :caption: Installation and Usage
 
+   usage
    license
 
 .. toctree::

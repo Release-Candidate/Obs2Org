@@ -1,4 +1,5 @@
 {
     "restructuredtext.languageServer.disabled": true,
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    "restructuredtext.confPath": "${workspaceFolder}\\obs2org\\doc\\source"
 }

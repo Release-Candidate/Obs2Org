@@ -66,7 +66,7 @@ to the following Org-Mode file:
    :PROPERTIES:
    :CUSTOM_ID: lisp
    :END:
-<20211008211713>
+
 *** Books   :Lisp:Book:
     :PROPERTIES:
     :CUSTOM_ID: bücher-1
@@ -294,7 +294,7 @@ The sources of the program are in the directory [./obs2org/](./obs2org/), the te
 
 ## License
 
-Obs2ORg ist licensed under the GPLv3.0, see file [LICENCE](./LICENSE).
+Obs2Org ist licensed under the GPLv3.0, see file [LICENCE](./LICENSE).
 
 ## Badges
 
