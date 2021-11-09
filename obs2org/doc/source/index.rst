@@ -22,11 +22,3 @@ Obs2Org
    :caption: Contributing
 
    contributing
-
-.. toctree::
-   :hidden:
-   :maxdepth: 5
-   :caption: Indices
-
-   genindex
-   py-modindex
