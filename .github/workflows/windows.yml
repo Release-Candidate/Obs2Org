@@ -93,7 +93,7 @@ jobs:
 
       - name: Install obs2org package ${{ matrix.python-version }}
         run: |
-          python -m pip install --upgrade
+          python -m pip install --upgrade obs2org
           choco install pandoc
 
       - name: Delete Source ${{ matrix.python-version }}
