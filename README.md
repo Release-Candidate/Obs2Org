@@ -93,25 +93,27 @@ Additional Documentation can be found at [Read the Docs](https://obs2org.readthe
 
 ## Table of Contents <!-- omit in TOC -->
 
-- [Example](#example)
-- [Installation](#installation)
-  - [Pandoc](#pandoc)
-  - [Obs2Org](#obs2org)
-    - [Python, at Least Version 3.9](#python-at-least-version-39)
-    - [The PyPI Obs2Org Package](#the-pypi-obs2org-package)
-- [Usage](#usage)
-  - [Examples](#examples)
-- [Development](#development)
-  - [Python, version > 3.9](#python-version--39)
-  - [Setup](#setup)
-  - [Scripts](#scripts)
-  - [Documentation](#documentation)
-  - [Sources](#sources)
-- [License](#license)
-- [Badges](#badges)
-  - [External Checks](#external-checks)
-  - [Static Code Checks](#static-code-checks)
-  - [Tests](#tests)
+- [Obs2Org ](#obs2org-)
+  - [Example](#example)
+  - [Table of Contents ](#table-of-contents-)
+  - [Installation](#installation)
+    - [Pandoc](#pandoc)
+    - [Obs2Org](#obs2org)
+      - [Python, at Least Version 3.9](#python-at-least-version-39)
+      - [The PyPI Obs2Org Package](#the-pypi-obs2org-package)
+  - [Usage](#usage)
+    - [Examples](#examples)
+  - [Development](#development)
+    - [Python, version \> 3.9](#python-version--39)
+    - [Setup](#setup)
+    - [Scripts](#scripts)
+    - [Documentation](#documentation)
+    - [Sources](#sources)
+  - [License](#license)
+  - [Badges](#badges)
+    - [External Checks](#external-checks)
+    - [Static Code Checks](#static-code-checks)
+    - [Tests](#tests)
 
 ## Installation
 
@@ -277,7 +279,7 @@ You need Python 3.9 or newer.
 
 ### Scripts
 
-- [](./make_package.sh) - Linux, OS X: build the Obs2Org PyPI package
+- [./make_package.sh](./make_package.sh) - Linux, OS X: build the Obs2Org PyPI package
 - [./make_package.bat](./make_package.bat) - Windows: build the Obs2Org PyPI package. This is disabled on Windows, because the scripts would not be executable because of the Windows filesystem.
 - [./run_local_linters.sh](./run_local_linters.sh) - Linux, OS X: run all configured linters on the Source code and tests.
 - [./run_local_linters.bat](./run_local_linters.bat) - Windows: run all configured linters on the Source code and tests.
