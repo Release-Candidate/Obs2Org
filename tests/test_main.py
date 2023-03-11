@@ -168,3 +168,11 @@ def test_convert_test2(capsys: pytest.CaptureFixture[str]) -> None:
         )
         is False
     )
+    assert (  # nosec
+        filecmp.cmp(
+            "./test_out/Test 3.org",
+            "./tests/fixtures/Test 3_orig.org",
+            shallow=False,
+        )
+        is True
+    )

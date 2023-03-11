@@ -1,4 +1,4 @@
-name: Tests Windows 2019
+name: Tests Windows
 
 # Controls when the action will run.
 on:
@@ -17,10 +17,10 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   tests-src:
-    runs-on: windows-2019
+    runs-on: windows-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10"]
+        python-version: ["3.9", "3.10", "3.11"]
       fail-fast: false
 
     steps:
@@ -75,10 +75,10 @@ jobs:
           verbose: true
 
   tests-pkg:
-    runs-on: windows-2019
+    runs-on: windows-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10"]
+        python-version: ["3.9", "3.10", "3.11"]
       fail-fast: false
 
     steps:
