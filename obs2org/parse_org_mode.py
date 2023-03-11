@@ -18,18 +18,25 @@ from typing import Match, Tuple
 
 # The first match group is the filename without suffix, the second match group
 # is the header name in the file to link to.
-_internal_wikilink_regexp = re.compile(r"\[\[(\w[^\[\]]*)#(\w[^\[\]]*)\]\]")
+_internal_wikilink_regexp: re.Pattern[str] = re.compile(
+    r"\[\[(\w[^\[\]]*)#(\w[^\[\]]*)\]\]"
+)
+
+# The first match group is the filename without suffix.
+_internal_wikilink_regexp_file_only: re.Pattern[str] = re.compile(
+    r"\[\[\s*(\w[^#\[\]]*)\s*\]\]"
+)
 
 # Date regexp, to get all variants of year, month and day placements and the
 # delimiters between them. Date must be on a line of it's own.
-_date_regexp = re.compile(
+_date_regexp: re.Pattern[str] = re.compile(
     r"^\s*(\d{1,4}[0-9.,/\\ -]\d{1,4}[0-9.,/\\ -]\d{1,4})\s*$", flags=re.MULTILINE
 )
 
 # Tag regexp, that captures the heading in the first match group, the list of
 # tags in the third match group and anything in between in the second match
 #  group.
-_tag_regexp = re.compile(
+_tag_regexp: re.Pattern[str] = re.compile(
     r"^(\s*\*{1,}\s[^\n]{1,})$([^*]*?)^\s*Keywords:\s*((?:#\S[^\n#,]*,?[^\S\n]*){1,})$",
     flags=re.MULTILINE,
 )
@@ -154,12 +161,21 @@ def _correct_org_mode_links(text: str, directory: Path) -> str:
     --------
     `[[books#My Heading]]` is changed to
     `[[file:books.org::#my-heading][My Heading]]`.
+    `[[Note]]` is changed to
+    `[[file:Note.org::#note][Note]]`.
     """
-    return _internal_wikilink_regexp.sub(
+    first_run = _internal_wikilink_regexp.sub(
         repl=lambda match_obj: _link_replace_func(
             match_obj=match_obj, directory=directory
         ),
         string=text,
+    )
+
+    return _internal_wikilink_regexp_file_only.sub(
+        repl=lambda match_obj: _link_replace_func(
+            match_obj=match_obj, directory=directory
+        ),
+        string=first_run,
     )
 
 
@@ -212,7 +228,10 @@ def _link_replace_func(match_obj: Match[str], directory: Path) -> str:
         heading as link title.
     """
     file_name: Path = directory / Path(match_obj.group(1) + ".org")
-    heading_name = match_obj.group(2)
+    if match_obj.lastindex == 1:
+        heading_name = match_obj.group(1)
+    else:
+        heading_name = match_obj.group(2)
     header_link = ""
     try:
         header_link, heading_name = _parse_linkedfile(
@@ -282,7 +301,7 @@ def _parse_text_for_heading(
     heading_name : str
         The name of the heading to search for.
     file_name : Path
-        The name of the file to parse, for error mesages only.
+        The name of the file to parse, for error messages only.
 
     Returns
     -------

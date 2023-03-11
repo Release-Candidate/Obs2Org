@@ -1,9 +1,11 @@
 #+title: Test2
 
 * Test 2
-  :PROPERTIES:
-  :CUSTOM_ID: test-2
-  :END:
+:PROPERTIES:
+:CUSTOM_ID: test-2
+:END:
 Keywords: test, test2
 <2021-11-05>
 Link to: [[file:test1.org#Documentation System]]
+
+Link to: [[Test 3]]

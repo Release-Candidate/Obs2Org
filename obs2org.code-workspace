@@ -7,6 +7,13 @@
 	"settings": {
 		"autoDocstring.docstringFormat": "numpy",
 		"coverage-gutters.coverageBaseDir": "./",
-		"coverage-gutters.xmlname": "coverage.xml"
+		"coverage-gutters.xmlname": "coverage.xml",
+		"cSpell.words": [
+			"excp",
+			"lastindex",
+			"linkedfile",
+			"pandoc",
+			"wikilink"
+		]
 	}
 }

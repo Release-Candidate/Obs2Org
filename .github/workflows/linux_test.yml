@@ -1,4 +1,4 @@
-name: Tests Ubuntu 20.04
+name: Tests Ubuntu
 
 # Controls when the action will run.
 on:
@@ -17,10 +17,10 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   tests-src:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10"]
+        python-version: ["3.9", "3.10", "3.11"]
       fail-fast: false
 
     steps:
@@ -75,10 +75,10 @@ jobs:
           verbose: true
 
   tests-package:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10"]
+        python-version: ["3.9", "3.10", "3.11"]
       fail-fast: false
 
     steps:
