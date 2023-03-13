@@ -10,7 +10,6 @@
 
 import filecmp
 import runpy
-import shutil
 import sys
 from typing import List
 from unittest import mock

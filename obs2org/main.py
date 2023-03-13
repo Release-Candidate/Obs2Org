@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 import argparse
-from ast import arg
 import asyncio
 import subprocess  # nosec
 from os import path, walk
@@ -228,7 +227,7 @@ def _check_pandoc(
         capture_output=True,
     )
 
-    if pandoc_out.returncode != 0 and pandoc_out.stderr is not None:
+    if pandoc_out.returncode != 0 and pandoc_out.stderr != "":
         cmd_line_parser.print_help()
         cmd_line_parser.error(
             "Pandoc executable '{pandoc}' not found or does not work!\n"

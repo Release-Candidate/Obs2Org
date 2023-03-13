@@ -91,7 +91,7 @@ def run_pandoc(in_file: Path, out_path: Path, pandoc: str) -> None:
         capture_output=True,
     )
 
-    if pandoc_out.returncode != 0 and pandoc_out.stderr is not None:
+    if pandoc_out.returncode != 0 and pandoc_out.stderr != "":
         raise subprocess.SubprocessError(
             "Pandoc error: '{err}'".format(err=pandoc_out.stderr.strip())
         )
@@ -126,7 +126,7 @@ def correct_org_mode(file_path: Path) -> None:
     except OSError as excp:
         print("Error opening file '{file}': {err}".format(file=tmp_file, err=excp))
     except Exception as excp:
-        print("Error: opening file '{}': {err}".format(file=tmp_file, err=excp))
+        print("Error: opening file '{file}': {err}".format(file=tmp_file, err=excp))
 
     else:
         print("OK\n")
