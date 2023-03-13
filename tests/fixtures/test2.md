@@ -14,6 +14,8 @@ Keywords: test, test2
 
 2021-11-05
 
-Link to: [[test1#Documentation System]]
+Link to: [[dir/test1#Documentation System]]
 
-Link to: [[Test 3]]
+Link to: [[dir/test1#Documentation System|Documentation]]
+
+Link to: [[dir1/Test 3]]

@@ -1,5 +1,16 @@
 # Obs2Org Changelog
 
+## Version 1.2.0 (2023-03-12)
+
+- Copy directory structure to the output directory.
+- Add documentation in [README.md](README.md).
+
+### Bugfix
+
+- Catch all exceptions when trying to read a file.
+- Correctly convert links of the forms `[[#heading-id|Caption]]`, `[[file|Caption]]` and `[[#Heading]]`. Fix [#1](https://github.com/Release-Candidate/Obs2Org/issues/1).
+- Correct documentation in [README.md](README.md).
+
 ## Version 1.1.0 (2023-03-11)
 
 ### Bugfix

@@ -1,4 +1,4 @@
-# Obs2Org <!-- omit in TOC -->
+# Obs2Org
 
 [![GPLv3 license badge](https://img.shields.io/github/license/Release-Candidate/Obs2Org)](https://github.com/Release-Candidate/Obs2Org/blob/main/LICENSE)
 [![Python version badge](https://img.shields.io/pypi/pyversions/Obs2Org)](https://www.python.org/downloads/)
@@ -58,19 +58,19 @@ to the following Org-Mode file:
 #+title: Programming
 
 * Programming              :Programming:
-  :PROPERTIES:
-  :CUSTOM_ID: programming
-  :END:
+:PROPERTIES:
+:CUSTOM_ID: programming
+:END:
 
 * Lisp
-   :PROPERTIES:
-   :CUSTOM_ID: lisp
-   :END:
+:PROPERTIES:
+:CUSTOM_ID: lisp
+:END:
 
 *** Books   :Lisp:Book:
-    :PROPERTIES:
-    :CUSTOM_ID: bücher-1
-    :END:
+:PROPERTIES:
+:CUSTOM_ID: bücher-1
+:END:
 
 
 - Lisp Cookbook, 'recipies' to solve common problems using Lisp: [[file:Books.org::#lisp-cookbook][Lisp Cookbook]]
@@ -78,9 +78,9 @@ to the following Org-Mode file:
 - *Peter Norvig*: /Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp/: [[file:Books.org::#paradigms-of-artificial-intelligence-programming][Paradigms of Artificial Intelligence Programming]]
 
 *** State of the Common Lisp ecosystem, 2020   :Lisp:Ecosystem:2020:
-    :PROPERTIES:
-    :CUSTOM_ID: state-of-the-common-lisp-ecosystem-2020
-    :END:
+:PROPERTIES:
+:CUSTOM_ID: state-of-the-common-lisp-ecosystem-2020
+:END:
 <2021-10-08>
 Editors, libraries, compilers, ... [[https://lisp-journey.gitlab.io/blog/state-of-the-common-lisp-ecosystem-2020/#development][State of the Common Lisp ecosystem, 2020]]
 ```
@@ -91,29 +91,29 @@ The PyPI (pip) package can be found at [Obs2Org at PyPI](https://pypi.org/projec
 
 Additional Documentation can be found at [Read the Docs](https://obs2org.readthedocs.io/en/latest)
 
-## Table of Contents <!-- omit in TOC -->
+## Table of Contents
 
-- [Obs2Org ](#obs2org-)
-  - [Example](#example)
-  - [Table of Contents ](#table-of-contents-)
-  - [Installation](#installation)
-    - [Pandoc](#pandoc)
-    - [Obs2Org](#obs2org)
-      - [Python, at Least Version 3.9](#python-at-least-version-39)
-      - [The PyPI Obs2Org Package](#the-pypi-obs2org-package)
-  - [Usage](#usage)
-    - [Examples](#examples)
-  - [Development](#development)
-    - [Python, version \> 3.9](#python-version--39)
-    - [Setup](#setup)
-    - [Scripts](#scripts)
-    - [Documentation](#documentation)
-    - [Sources](#sources)
-  - [License](#license)
-  - [Badges](#badges)
-    - [External Checks](#external-checks)
-    - [Static Code Checks](#static-code-checks)
-    - [Tests](#tests)
+- [Example](#example)
+- [Table of Contents](#table-of-contents)
+- [Installation](#installation)
+  - [Pandoc](#pandoc)
+  - [Obs2Org](#obs2org-1)
+    - [Python, at Least Version 3.9](#python-at-least-version-39)
+    - [The PyPI Obs2Org Package](#the-pypi-obs2org-package)
+- [Usage](#usage)
+  - [Examples](#examples)
+  - [Supported Links](#supported-links)
+- [Development](#development)
+  - [Python, version \> 3.9](#python-version--39)
+  - [Setup](#setup)
+  - [Scripts](#scripts)
+  - [Documentation](#documentation)
+  - [Sources](#sources)
+- [License](#license)
+- [Badges](#badges)
+  - [External Checks](#external-checks)
+  - [Static Code Checks](#static-code-checks)
+  - [Tests](#tests)
 
 ## Installation
 
@@ -166,7 +166,7 @@ This should yield the version string like
 
 ```ps1
 > python -m obs2org --version
-obs2org 1.0.0
+obs2org 1.2.0
 ```
 
 To get a text explaining the usage of Obs2Org, use the argument `--help` or the short form `-h`:
@@ -206,7 +206,7 @@ To set the path to Pandoc to `c:/pandoc/pandoc` add `--pandoc c:/pandoc/pandoc` 
 Example:
 
 ```ps1
-python -m obs2org ./Markdown ../Org --pandoc c:/pandoc/pandoc
+python -m obs2org ./Markdown -o ../Org/ --pandoc c:/pandoc/pandoc
 ```
 
 1. current directory
@@ -247,22 +247,33 @@ python -m obs2org ./Markdown ../Org --pandoc c:/pandoc/pandoc
 4. convert files to given directory
 
     ```ps1
-    python -m obs2org *.md ../Org
+    python -m obs2org *.md -o ../Org/
     ```
 
     Converts all markdown files with a suffix of `.md` in the current working
     directory to files in Org-Mode format with the same base filename but a
-    `.org` suffix in the directory `../Org`.
+    `.org` suffix in the directory `../Org`. The directory to save to _must_ have a slash `/` at the end.
 
 5. convert files in given directory to other directory
 
     ```ps1
-    python -m obs2org ./Markdown ../Org
+    python -m obs2org ./Markdown -o ../Org/
     ```
 
     Converts all markdown files with a suffix of `.md` in the directory
     `./Markdown` and its subdirectories to files in Org-Mode format with
     the same base filename but a `.org` suffix in the directory `../Org`.
+    The directory to save to _must_ have a slash `/` at the end.
+
+### Supported Links
+
+The following list shows which Markdown links are converted to which Org-Mode links:
+
+- `[[books#My Heading]]` is changed to `[[file:books.org::#my-heading][My Heading]]`.
+- `[[Note]]` is changed to `[[file:Note.org::#note][Note]]`.
+- `[[#heading-id|Caption]]` is changed to `[[#heading-id][Caption]]`
+- `[[file|Caption]]` is changed to `[[file][Caption]]`
+- `[[#Heading]]` is changed to `[[*Heading]]`
 
 ## Development
 

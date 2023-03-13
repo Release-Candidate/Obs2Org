@@ -9,4 +9,4 @@
 
 from __future__ import annotations
 
-VERSION: str = "1.1.0"
+VERSION: str = "1.2.0"
