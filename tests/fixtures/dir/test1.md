@@ -34,3 +34,17 @@ Keywords: #Documentation, #Programming, #Book
 Wie man die 4 Typen der Dokumentation - Tutorials, How-Tos, Explanations und References - als Software Entwickler schreibt und was es zu beachten gibt.
 Online:
 [The documentation system — Documentation system documentation](https://documentation.divio.com/)
+
+Test internal Link: [[#Computer / Programming]]
+
+Test external Link: [[some file.png|Image]]
+
+Test heading with id: [[#heading-id|Caption]]
+
+Test web url: [[https://some.com/link]]
+
+Test file with suffix: [[some file.sfx]]
+
+Test pdf: [[Лекции по микроэлектронным устройствам СВЧ.pdf#page=7]]
+
+Test PDF2: [[Проектирование РПрУ, Сиверс.pdf#page=6|Сиверса, стр. 11]]

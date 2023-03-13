@@ -104,8 +104,8 @@ def test_illegal_pandoc() -> None:
 
 ################################################################################
 def test_convert_test1(capsys: pytest.CaptureFixture[str]) -> None:
-    """Test conversion of `fixture/test1.md`."""
-    run_obs2org(["./tests/fixtures/test1.md", "-o", "test_out/"])
+    """Test conversion of `fixture/dir/test1.md`."""
+    run_obs2org(["./tests/fixtures/dir/test1.md", "-o", "test_out/"])
 
     captured = capsys.readouterr()
     assert captured.err == ""  # nosec
@@ -118,19 +118,11 @@ def test_convert_test1(capsys: pytest.CaptureFixture[str]) -> None:
         )
         is True
     )
-    assert (  # nosec
-        filecmp.cmp(
-            "./test_out/test1.org",
-            "./tests/fixtures/test1_fails.org",
-            shallow=False,
-        )
-        is False
-    )
 
 
 ################################################################################
 def test_convert_test2(capsys: pytest.CaptureFixture[str]) -> None:
-    """Test conversion of `fixture/test1.md` and `fixture/test2.md`."""
+    """Test conversion of `fixture/dir/test1.md` and `fixture/test2.md`."""
     run_obs2org(["./tests/fixtures/", "-o=test_out/"])
 
     captured = capsys.readouterr()
@@ -138,19 +130,11 @@ def test_convert_test2(capsys: pytest.CaptureFixture[str]) -> None:
     assert captured.out.find("OK") > 1  # nosec
     assert (  # nosec
         filecmp.cmp(
-            "./test_out/test1.org",
+            "./test_out/dir/test1.org",
             "./tests/fixtures/test1_orig.org",
             shallow=False,
         )
         is True
-    )
-    assert (  # nosec
-        filecmp.cmp(
-            "./test_out/test1.org",
-            "./tests/fixtures/test1_fails.org",
-            shallow=False,
-        )
-        is False
     )
     assert (  # nosec
         filecmp.cmp(
@@ -162,15 +146,7 @@ def test_convert_test2(capsys: pytest.CaptureFixture[str]) -> None:
     )
     assert (  # nosec
         filecmp.cmp(
-            "./test_out/test2.org",
-            "./tests/fixtures/test2_fails.org",
-            shallow=False,
-        )
-        is False
-    )
-    assert (  # nosec
-        filecmp.cmp(
-            "./test_out/Test 3.org",
+            "./test_out/dir1/Test 3.org",
             "./tests/fixtures/Test 3_orig.org",
             shallow=False,
         )

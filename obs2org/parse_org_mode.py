@@ -13,18 +13,56 @@ in angle brackets.
 from __future__ import annotations
 
 import re
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Match, Tuple
 
 # The first match group is the filename without suffix, the second match group
 # is the header name in the file to link to.
+# Not matching files with suffixes.
+# `[[file#Heading]]` -> `file.org`, `#Heading`
 _internal_wikilink_regexp: re.Pattern[str] = re.compile(
-    r"\[\[(\w[^\[\]]*)#(\w[^\[\]]*)\]\]"
+    r"\[\[(?!https?|ftp|file|cite|.*\.\w+)(\S[^\[\]]*)#(\S[^\[\]]*?)(?:\|.*)?\]\]"
 )
 
 # The first match group is the filename without suffix.
+# `[[Heading]]` -> `Heading.org`, `#Heading`
+# Not converting files with suffixes: `[[File.sfx]]`
+# Not converting links starting with `http`, `https` or `ftp`
+# `[[http://not/converted]]`
 _internal_wikilink_regexp_file_only: re.Pattern[str] = re.compile(
-    r"\[\[\s*(\w[^#\[\]]*)\s*\]\]"
+    r"\[\[(?!\*|https?|ftp|file|cite|[^\[\]]*\.[^В\s]+\])\s*([^#|\[\]]*)\s*\]\]"
+)
+
+# The first match group is the heading to link to.
+# `[[#Heading]]` -> `#Heading`
+_internal_wikilink_same_doc_regexp: re.Pattern[str] = re.compile(
+    r"\[\[\s*#\s*([^#|\[\]]*)\s*\]\]"
+)
+
+# The first ,match group is the filename, the second the link's caption.
+# `[[file|Caption]]` -> `file`, `#Caption`
+# Not matching files with a suffix.
+_internal_wikilink_named_regexp: re.Pattern[str] = re.compile(
+    r"\[\[(?!#)(?!.*\.\w+)(\S[^\[\]]*?)(?:#\^?\w+)?(?:#page=\d+)?\|(?:\S[^\[\]]*)\]\]"
+)
+
+# The first ,match group is the filename, the second the link's caption.
+# `[[file|Caption]]` -> `file`, `#Caption`
+# Not matching files with a suffix.
+_internal_header_named_regexp: re.Pattern[str] = re.compile(
+    r"\[\[(?!.*\.\w+)(#\w[^\[\]]*?)(?:#\^?\w+)?(?:#page=\d+)?\|(\S[^\[\]]*)\]\]"
+)
+
+# The first ,match group is the filename, the second the link's caption.
+# `[[file.sfx|Caption]]` -> `file.sfx`, `#Caption`
+_file_wikilink_named_regexp: re.Pattern[str] = re.compile(
+    r"\[\[(?!#)(\S[^\[\]]*?\.\w+)(?:#\^?\w+)?(?:#page=\d+)?\|(\S[^\[\]]*)\]\]"
+)
+
+# The first ,match group is the filename, the second the link's caption.
+# `[[file.sfx]]` -> `file.sfx`
+_file_wikilink_regexp: re.Pattern[str] = re.compile(
+    r"\[\[(?!#|(?:file|http[s]?|ftp|zotero|cite:))(\S[^\[\]]*?\.[^В\s]+?)(?:#\^?\w+)?(?:#page=\d+)?\]\]"
 )
 
 # Date regexp, to get all variants of year, month and day placements and the
@@ -161,21 +199,49 @@ def _correct_org_mode_links(text: str, directory: Path) -> str:
     --------
     `[[books#My Heading]]` is changed to
     `[[file:books.org::#my-heading][My Heading]]`.
+
     `[[Note]]` is changed to
     `[[file:Note.org::#note][Note]]`.
+
+    `[[#heading-id|Caption]]` is changed to
+    `[[#heading-id][Caption]]`
+
+    `[[file|Caption]]` is changed to
+    `[[file][Caption]]`
+
+    `[[#Heading]]` is changed to
+    `[[*Heading]]`
     """
-    first_run = _internal_wikilink_regexp.sub(
+    first_pass = _internal_wikilink_regexp.sub(
         repl=lambda match_obj: _link_replace_func(
             match_obj=match_obj, directory=directory
         ),
         string=text,
+    )
+    second_pass = _internal_wikilink_same_doc_regexp.sub(
+        repl=r"[[*\1]]", string=first_pass
+    )
+
+    third_pass = _internal_wikilink_named_regexp.sub(
+        repl=lambda match_obj: _link_replace_func(
+            match_obj=match_obj, directory=directory
+        ),
+        string=second_pass,
+    )
+
+    fourth_pass = _file_wikilink_named_regexp.sub(repl=r"[[\1][\2]]", string=third_pass)
+
+    fifth_pass = _file_wikilink_regexp.sub(repl=r"[[file:\1]]", string=fourth_pass)
+
+    sixth_pass = _internal_header_named_regexp.sub(
+        repl=r"[[\1][\2]]", string=fifth_pass
     )
 
     return _internal_wikilink_regexp_file_only.sub(
         repl=lambda match_obj: _link_replace_func(
             match_obj=match_obj, directory=directory
         ),
-        string=first_run,
+        string=sixth_pass,
     )
 
 
@@ -229,7 +295,7 @@ def _link_replace_func(match_obj: Match[str], directory: Path) -> str:
     """
     file_name: Path = directory / Path(match_obj.group(1) + ".org")
     if match_obj.lastindex == 1:
-        heading_name = match_obj.group(1)
+        heading_name = PurePath(match_obj.group(1)).name
     else:
         heading_name = match_obj.group(2)
     header_link = ""
@@ -243,8 +309,20 @@ def _link_replace_func(match_obj: Match[str], directory: Path) -> str:
                 file=file_name.absolute(), heading=heading_name
             )
         )
+    except OSError as excp:
+        print("Error reading file '{file}': '{err}'".format(file=file_name, err=excp))
+    except Exception as excp:
+        print("Error reading file '{file}': {err}".format(file=file_name, err=excp))
 
-    return "[[file:" + file_name.name + header_link + "][" + heading_name + "]]"
+    return (
+        "[[file:"
+        + match_obj.group(1)
+        + ".org"
+        + header_link
+        + "]["
+        + heading_name
+        + "]]"
+    )
 
 
 ###############################################################################
@@ -269,9 +347,7 @@ def _parse_linkedfile(file_name: Path, heading_name: str) -> Tuple[str, str]:
         A tuple `header_link`, `header_name` containing the headings
         id and the full name of the heading.
     """
-    heading_name_regexp = re.sub(
-        string=heading_name, repl=r"[\\W]{1,}", pattern=r"^|\s|$"
-    )
+    heading_name_regexp = heading_name.strip()
 
     with file_name.open(mode="r", encoding="utf-8") as f_d:
         file_text = f_d.read()
@@ -311,11 +387,13 @@ def _parse_text_for_heading(
     """
     header_link = ""
     header_pattern = (
-        r"\*{1,}\s*("
-        + heading_name_regexp
-        + r")\s*[\w:.-]*\s*.*?\s*:CUSTOM_ID:\s*([\w.-]{1,})$"
+        r"^\s*\*{1,}\s*("
+        + re.escape(heading_name_regexp)
+        + r")\s*[\w:.-]+\s*.*?\s*^:CUSTOM_ID:\s*([^\s]+)$"
     )
-    file_match = re.search(pattern=header_pattern, string=text, flags=re.MULTILINE)
+    file_match = re.search(
+        pattern=header_pattern, string=text, flags=re.MULTILINE | re.IGNORECASE
+    )
     if file_match is not None:
         header_link = "::#" + file_match.group(2)
         heading_name = file_match.group(1).strip(":").strip()

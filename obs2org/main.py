@@ -54,13 +54,13 @@ Converts all markdown files with a suffix of '.md' in the current working
 directory to files in Org-Mode format with the same base filename but a
 '.org' suffix.
 
-python -m obs2org *.md ../Org
+python -m obs2org *.md -o ../Org/
 
 Converts all markdown files with a suffix of '.md' in the current working
 directory to files in Org-Mode format with the same base filename but a
 '.org' suffix in the directory '../Org'.
 
-python -m obs2org ./Markdown ../Org
+python -m obs2org ./Markdown -o ../Org/
 
 Converts all markdown files with a suffix of '.md' in the directory
 './Markdown' and its subdirectories to files in Org-Mode format with
@@ -227,7 +227,7 @@ def _check_pandoc(
         capture_output=True,
     )
 
-    if pandoc_out.returncode != 0 and pandoc_out.stderr is not None:
+    if pandoc_out.returncode != 0 and pandoc_out.stderr != "":
         cmd_line_parser.print_help()
         cmd_line_parser.error(
             "Pandoc executable '{pandoc}' not found or does not work!\n"
@@ -304,11 +304,14 @@ def _walk_directory(out_path: str, arg_path: str) -> list[FilePaths]:
     """
     ret_list: list[FilePaths] = []
     for dirpath, _, filenames in walk(top=arg_path, topdown=True, followlinks=True):
+        rel_dirpath = path.relpath(dirpath, arg_path)
+        out_dir = path.join(out_path, rel_dirpath)
+        Path(out_dir).mkdir(exist_ok=True, parents=True)
         for file in filenames:
             file_object = PurePath(file)
             if file_object.suffix == ".md":
                 in_file = path.join(dirpath, file)
-                out_file = path.join(out_path, file_object.with_suffix(".org"))
+                out_file = path.join(out_dir, file_object.with_suffix(".org"))
                 ret_list.append(
                     FilePaths(in_file=Path(in_file), out_file=Path(out_file))
                 )
@@ -391,6 +394,6 @@ async def _do_convert_files(pandoc_path: str, list_of_files: list[FilePaths]) ->
     await asyncio.gather(*convert_tasks)
 
     # Can't run this asynchronously, as
-    #
+    # we need to look up headings in converted files.
     for correct_file in list_of_files:
         correct_org_mode(correct_file.out_file)

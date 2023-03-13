@@ -34,9 +34,10 @@ def convert_single_file(path: Path, out_path: Path, pandoc: str) -> None:
         The path to the pandoc executable to convert the file.
     """
     print(
-        "Converting file '{in_path}' to '{out_path}' using '{pandoc}'".format(
+        "Converting file '{in_path}' to '{out_path}' using '{pandoc}'\n".format(
             in_path=path, out_path=out_path, pandoc=pandoc
-        )
+        ),
+        flush=True,
     )
     try:
         run_pandoc(in_file=path, out_path=out_path, pandoc=pandoc)
@@ -44,10 +45,11 @@ def convert_single_file(path: Path, out_path: Path, pandoc: str) -> None:
         print(
             "{err} converting file '{in_path}' to '{out_path}'\n".format(
                 err=excp, in_path=path, out_path=out_path
-            )
+            ),
+            flush=True,
         )
     else:
-        print("OK\n")
+        print("File converted to '{path}'.\n".format(path=out_path), flush=True)
 
 
 ###############################################################################
@@ -89,7 +91,7 @@ def run_pandoc(in_file: Path, out_path: Path, pandoc: str) -> None:
         capture_output=True,
     )
 
-    if pandoc_out.returncode != 0 and pandoc_out.stderr is not None:
+    if pandoc_out.returncode != 0 and pandoc_out.stderr != "":
         raise subprocess.SubprocessError(
             "Pandoc error: '{err}'".format(err=pandoc_out.stderr.strip())
         )
@@ -121,6 +123,10 @@ def correct_org_mode(file_path: Path) -> None:
 
     except FileNotFoundError as excp:
         print("Error, a file has not been found. '{err}'".format(err=excp))
+    except OSError as excp:
+        print("Error opening file '{file}': {err}".format(file=tmp_file, err=excp))
+    except Exception as excp:
+        print("Error: opening file '{file}': {err}".format(file=tmp_file, err=excp))
 
     else:
         print("OK\n")
