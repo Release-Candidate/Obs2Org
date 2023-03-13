@@ -1,6 +1,6 @@
 # Obs2Org Changelog
 
-## Version 1.2.0 (2023-03-12)
+## Version 1.2.0 (2023-03-13)
 
 - Copy directory structure to the output directory.
 - Add documentation in [README.md](README.md).
