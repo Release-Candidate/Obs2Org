@@ -117,7 +117,7 @@ are given, the current working directory is used.""",
         "-V",
         "--version",
         action="version",
-        version="obs2org {version}".format(version=VERSION),
+        version=f"obs2org {VERSION}",
     )
 
     cmd_line_parser.add_argument(
@@ -129,6 +129,30 @@ are given, the current working directory is used.""",
         default="pandoc",
         help="""PANDOC is the path to the pandoc executable, if the
 Pandoc executable isn't in the PATH.""",
+    )
+
+    cmd_line_parser.add_argument(
+        "-n",
+        "--no-cite",
+        action="store_true",
+        dest="remove_citations",
+        default=False,
+        help="""If this flag is set, links like '[[@Name]]' are threaded
+like normal links instead of Pandoc citations.
+If this is not set, '[[@Name]]' is converted to '[[cite:@Name]]'""",
+    )
+
+    cmd_line_parser.add_argument(
+        "-u",
+        "--uuid",
+        action="store_true",
+        dest="generate_uuid",
+        default=False,
+        help="""If this flag is set, every file gets a header of the form
+:PROPERTIES:
+:ID: UUID
+:END:
+where UUID is a UUID like '16fd2706-8baf-433b-82eb-8c7fada847da'.""",
     )
 
     cmd_line_parser.add_argument(
@@ -191,7 +215,12 @@ async def _convert_files(
         )
         list_of_files.extend(paths)
 
-    await _do_convert_files(pandoc_path=pandoc_path, list_of_files=list_of_files)
+    await _do_convert_files(
+        pandoc_path=pandoc_path,
+        list_of_files=list_of_files,
+        add_uuid=cmd_line_args.generate_uuid,
+        remove_citations=cmd_line_args.remove_citations,
+    )
 
 
 ################################################################################
@@ -228,12 +257,11 @@ def _check_pandoc(
     )
 
     if pandoc_out.returncode != 0 and pandoc_out.stderr != "":
-        cmd_line_parser.print_help()
         cmd_line_parser.error(
-            "Pandoc executable '{pandoc}' not found or does not work!\n"
-            "Error message: '{error}'\n"
-            "Look at https://pandoc.org/installing.html for information on how to install\n"
-            "pandoc".format(pandoc=pandoc, error=pandoc_out.stderr.strip())
+            f"Pandoc executable '{pandoc}' not found or does not work!\n"
+            f"Error message: '{pandoc_out.stderr.strip()}'\n"
+            f"Look at https://pandoc.org/installing.html for information on how to install\n"
+            f"pandoc"
         )
 
     return pandoc
@@ -276,10 +304,7 @@ def _check_in_path(
         ret_list.append(FilePaths(in_file=file_obj, out_file=Path(out_file)))
 
     else:
-        cmd_line_parser.print_help()
-        cmd_line_parser.error(
-            "no markdown files found at path '{path}'".format(path=arg_path)
-        )
+        cmd_line_parser.error(f"no markdown file(s) found at path '{arg_path}'.")
 
     return ret_list
 
@@ -348,22 +373,26 @@ def _check_out_path(
     out_path: str = cmd_line_args.out_path
 
     if path.basename(out_path) == "" or path.isdir(out_path):
-        print("Output to directory {dir}".format(dir=out_path))
+        print(f"Output to directory {out_path}")
         Path(out_path).mkdir(exist_ok=True, parents=True)
     else:
-        print("Output to file {file}".format(file=out_path))
-        if len(path_list) <= 1:
-            cmd_line_parser.print_help()
+        print(f"Output to file {out_path} {len(path_list)}")
+        if len(path_list) >= 1:
             cmd_line_parser.error(
-                "more than one markdown file to convert given,"
-                "but just one output file '{path}'!".format(path=out_path)
+                f"more than one markdown file to convert given,"
+                f" but just one output file '{out_path}'!"
             )
 
     return out_path
 
 
 ################################################################################
-async def _do_convert_files(pandoc_path: str, list_of_files: list[FilePaths]) -> None:
+async def _do_convert_files(
+    pandoc_path: str,
+    list_of_files: list[FilePaths],
+    remove_citations: bool,
+    add_uuid: bool,
+) -> None:
     """Converts the files in the given list.
 
     First converts the files in `list_of_files` using pandoc and then fixes the
@@ -379,6 +408,11 @@ async def _do_convert_files(pandoc_path: str, list_of_files: list[FilePaths]) ->
     list_of_files : list[FilePaths]
         List of `FilePaths` containing the path to the Markdown file to convert
         and the Org-Mode file to generate.
+    remove_citations : bool
+        Whether to remove Pandoc-style citations to treat them as normal links,
+        or not.
+    add_uuid : bool
+        Whether to add an UUID-header to each file.
     """
     convert_tasks: list[Coroutine[object, object, object]] = []
     for convert_file in list_of_files:
@@ -396,4 +430,6 @@ async def _do_convert_files(pandoc_path: str, list_of_files: list[FilePaths]) ->
     # Can't run this asynchronously, as
     # we need to look up headings in converted files.
     for correct_file in list_of_files:
-        correct_org_mode(correct_file.out_file)
+        correct_org_mode(
+            correct_file.out_file, remove_citations=remove_citations, add_uuid=add_uuid
+        )

@@ -122,7 +122,7 @@ def test_convert_test1(capsys: pytest.CaptureFixture[str]) -> None:
 
 ################################################################################
 def test_convert_test2(capsys: pytest.CaptureFixture[str]) -> None:
-    """Test conversion of `fixture/dir/test1.md` and `fixture/test2.md`."""
+    """Test conversion of `fixture/dir/test1.md`, `fixture/test2.md` and `dir1/Test 3.md`."""
     run_obs2org(["./tests/fixtures/", "-o=test_out/"])
 
     captured = capsys.readouterr()
@@ -148,6 +148,40 @@ def test_convert_test2(capsys: pytest.CaptureFixture[str]) -> None:
         filecmp.cmp(
             "./test_out/dir1/Test 3.org",
             "./tests/fixtures/Test 3_orig.org",
+            shallow=False,
+        )
+        is True
+    )
+
+
+################################################################################
+def test_convert_test3(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test conversion and removing cites of `fixture/dir/test1.md`, `fixture/test2.md` and `dir1/Test 3.md`."""
+    run_obs2org(["./tests/fixtures/", "-o=test_out/", "-n"])
+
+    captured = capsys.readouterr()
+    assert captured.err == ""  # nosec
+    assert captured.out.find("OK") > 1  # nosec
+    assert (  # nosec
+        filecmp.cmp(
+            "./test_out/dir/test1.org",
+            "./tests/fixtures/test1_orig.org",
+            shallow=False,
+        )
+        is True
+    )
+    assert (  # nosec
+        filecmp.cmp(
+            "./test_out/test2.org",
+            "./tests/fixtures/test2_orig.org",
+            shallow=False,
+        )
+        is True
+    )
+    assert (  # nosec
+        filecmp.cmp(
+            "./test_out/dir1/Test 3.org",
+            "./tests/fixtures/Test 3_orig_no_cite.org",
             shallow=False,
         )
         is True

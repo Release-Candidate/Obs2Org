@@ -1,5 +1,20 @@
 # Obs2Org Changelog
 
+## Version 1.3.0 (2023-03-14)
+
+- Make the error message less cluttered.
+- Add option `-u|--uuid` to add an UUID header to every file that doesn't have one.
+- Add option `-n|--no-cite` to treat `[[@file]]` links as files instead of Pandoc citations.
+
+### Bugfixes
+
+- Fix the check for the output directory that didn't work. If more than one file to convert is given, the output argument must be a directory, not a single file.
+
+### Internal Changes
+
+- Change the format strings to 'f-strings'.
+- Add pylint to `run_local_linters` scripts.
+
 ## Version 1.2.0 (2023-03-13)
 
 - Copy directory structure to the output directory.

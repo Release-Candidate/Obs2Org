@@ -34,22 +34,18 @@ def convert_single_file(path: Path, out_path: Path, pandoc: str) -> None:
         The path to the pandoc executable to convert the file.
     """
     print(
-        "Converting file '{in_path}' to '{out_path}' using '{pandoc}'\n".format(
-            in_path=path, out_path=out_path, pandoc=pandoc
-        ),
+        f"Converting file '{path}' to '{out_path}' using '{pandoc}'\n",
         flush=True,
     )
     try:
         run_pandoc(in_file=path, out_path=out_path, pandoc=pandoc)
     except subprocess.SubprocessError as excp:
         print(
-            "{err} converting file '{in_path}' to '{out_path}'\n".format(
-                err=excp, in_path=path, out_path=out_path
-            ),
+            f"{excp} converting file '{path}' to '{out_path}'\n",
             flush=True,
         )
     else:
-        print("File converted to '{path}'.\n".format(path=out_path), flush=True)
+        print(f"File converted to '{out_path}'.\n", flush=True)
 
 
 ###############################################################################
@@ -92,13 +88,15 @@ def run_pandoc(in_file: Path, out_path: Path, pandoc: str) -> None:
     )
 
     if pandoc_out.returncode != 0 and pandoc_out.stderr != "":
-        raise subprocess.SubprocessError(
-            "Pandoc error: '{err}'".format(err=pandoc_out.stderr.strip())
-        )
+        raise subprocess.SubprocessError(f"Pandoc error: '{pandoc_out.stderr.strip()}'")
 
 
 ###############################################################################
-def correct_org_mode(file_path: Path) -> None:
+def correct_org_mode(
+    file_path: Path,
+    remove_citations: bool,
+    add_uuid: bool,
+) -> None:
     """Correct internal links, tags and dates in the generated Org-Mode file.
 
     Parse the generated Org-Mode file with path `out_path` and correct
@@ -108,25 +106,35 @@ def correct_org_mode(file_path: Path) -> None:
     ----------
     file_path : str
         The path to the generated Org-Mode file to correct.
+    remove_citations : bool
+        Whether to remove Pandoc-style citations to treat them as normal links,
+        or not.
+    add_uuid : bool
+        Whether to add an UUID-header to each file.
 
     """
-    print("Correcting links, tags, ... in file '{in_path}'".format(in_path=file_path))
+    print(f"Correcting links, tags, ... in file '{file_path}'")
     tmp_file = file_path.with_suffix(".org~")
     try:
         with file_path.open(mode="r", encoding="utf-8") as f_d:
             file_text = f_d.read()
-            new_text = correct_org_mode_file(file_text, file_path.parent)
+            new_text = correct_org_mode_file(
+                file_text,
+                file_path.parent,
+                add_uuid=add_uuid,
+                remove_citations=remove_citations,
+            )
         with tmp_file.open(mode="w", encoding="utf-8") as tmp:
             tmp.write(new_text)
 
         tmp_file.replace(file_path)
 
     except FileNotFoundError as excp:
-        print("Error, a file has not been found. '{err}'".format(err=excp))
+        print(f"Error, a file has not been found. '{excp}'")
     except OSError as excp:
-        print("Error opening file '{file}': {err}".format(file=tmp_file, err=excp))
+        print(f"Error opening file '{tmp_file}': {excp}")
     except Exception as excp:
-        print("Error: opening file '{file}': {err}".format(file=tmp_file, err=excp))
+        print(f"Error: opening file '{tmp_file}': {excp}")
 
     else:
         print("OK\n")

@@ -19,8 +19,8 @@ import sys
 
 if sys.version_info.major < 3 or sys.version_info.minor < 9:
     print(
-        "ERROR: Python version is too old, I need at least Python 3.9,"
-        " this has a version of {version}".format(version=platform.python_version()),
+        f"ERROR: Python version is too old, I need at least Python 3.9,"
+        f" this has a version of {platform.python_version()}",
         file=sys.stderr,
     )
     sys.exit(1)

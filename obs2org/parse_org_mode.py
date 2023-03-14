@@ -15,6 +15,7 @@ from __future__ import annotations
 import re
 from pathlib import Path, PurePath
 from typing import Match, Tuple
+from uuid import uuid4
 
 # The first match group is the filename without suffix, the second match group
 # is the header name in the file to link to.
@@ -46,8 +47,8 @@ _internal_wikilink_named_regexp: re.Pattern[str] = re.compile(
     r"\[\[(?!#)(?!.*\.\w+)(\S[^\[\]]*?)(?:#\^?\w+)?(?:#page=\d+)?\|(?:\S[^\[\]]*)\]\]"
 )
 
-# The first ,match group is the filename, the second the link's caption.
-# `[[file|Caption]]` -> `file`, `#Caption`
+# The first, match group is the heading to link to.
+# `[[#Caption]]` -> `[[*Caption]]`
 # Not matching files with a suffix.
 _internal_header_named_regexp: re.Pattern[str] = re.compile(
     r"\[\[(?!.*\.\w+)(#\w[^\[\]]*?)(?:#\^?\w+)?(?:#page=\d+)?\|(\S[^\[\]]*)\]\]"
@@ -87,9 +88,26 @@ _tag_convert_regex = re.compile(r"(?:^\s*#)|(?:\s*,\s*#)|(?:$)")
 # Regexp to remove all characters from a tag, that Org-Mode doesn't like.
 _tag_remove_special_regex = re.compile(r"[^\w:]")
 
+# Contains the actual link (including the '@') the the first match group.
+# `[[cite:@Link]]` -> `@Link`
+_cite_regex: re.Pattern[str] = re.compile(r"\[\[\s*cite:(@.*?)\s*\]\]")
+
+# Pattern to match an Org-Roam file header.
+_header_regex: re.Pattern[str] = re.compile(
+    r"^\s*:PROPERTIES:\s*\n\s*:ID:\s*\S+\s*\n\s*:END:"
+)
+
+# Pattern to match the beginning of the file.
+_start_of_file_regex: re.Pattern[str] = re.compile(r"^")
+
 
 ###############################################################################
-def correct_org_mode_file(text: str, directory: Path) -> str:
+def correct_org_mode_file(
+    text: str,
+    directory: Path,
+    remove_citations: bool,
+    add_uuid: bool,
+) -> str:
     """Parse Org-Mode formatted text and correct wiki-style links, tags and
     date strings.
 
@@ -103,6 +121,11 @@ def correct_org_mode_file(text: str, directory: Path) -> str:
         The Org-Mode text to parse.
     directory : Path
         The directory the Org-Mode files to link to are located in.
+    remove_citations : bool
+        Whether to remove Pandoc-style citations to treat them as normal links,
+        or not.
+    add_uuid : bool
+        Whether to add an UUID-header to each file.
 
     Returns
     -------
@@ -111,6 +134,10 @@ def correct_org_mode_file(text: str, directory: Path) -> str:
     """
     corrected_tags = _correct_org_mode_tags(text=text)
     corrected_dates = _correct_org_mode_date(text=corrected_tags)
+    if add_uuid:
+        corrected_dates = _add_uuid_header(text=corrected_dates)
+    if remove_citations:
+        corrected_dates = _remove_pandoc_citations(text=corrected_dates)
     corrected_links = _correct_org_mode_links(text=corrected_dates, directory=directory)
     return corrected_links
 
@@ -174,6 +201,50 @@ def _correct_org_mode_date(text: str) -> str:
     `2021-05-28` is replaced by `<2021-05-28>`.
     """
     return _date_regexp.sub(r"<\1>", text)
+
+
+###############################################################################
+def _add_uuid_header(text: str) -> str:
+    """Add the Org-Roam UUID header to the start of the file if it doesn't
+    already have one.
+
+    :PROPERTIES:
+    :ID: UUID
+    :END:
+
+    Parameters
+    ----------
+    text : str
+        The content of the file.
+
+    Returns
+    -------
+    str
+        The file with an Org-Roam header added if it didn't already have one.
+    """
+    if _header_regex.match(string=text):
+        return text
+    uuid_string = f":PROPERTIES:\n:ID: {uuid4()}\n:END:\n"
+    with_header = _start_of_file_regex.sub(repl=f"{uuid_string}\n", string=text)
+    return with_header
+
+
+###############################################################################
+def _remove_pandoc_citations(text: str) -> str:
+    """Remove Pandoc `cite` prefix from
+
+    Parameters
+    ----------
+    text : str
+        The content of the file to parse.
+
+    Returns
+    -------
+    str
+        The file content with removed `cite:` prefixes in links.
+    """
+    no_cites = _cite_regex.sub(repl=r"[[\1]]", string=text)
+    return no_cites
 
 
 ###############################################################################
@@ -305,14 +376,13 @@ def _link_replace_func(match_obj: Match[str], directory: Path) -> str:
         )
     except FileNotFoundError:
         print(
-            "Error, linked file '{file}' has not been found, link to section '{heading}' won't work!".format(
-                file=file_name.absolute(), heading=heading_name
-            )
+            f"Error, linked file '{file_name.absolute()}' has not been found, "
+            f"link to section '{heading_name}' won't work!"
         )
     except OSError as excp:
-        print("Error reading file '{file}': '{err}'".format(file=file_name, err=excp))
+        print(f"Error reading file '{file_name}': '{excp}'")
     except Exception as excp:
-        print("Error reading file '{file}': {err}".format(file=file_name, err=excp))
+        print(f"Error reading file '{file_name}': {excp}")
 
     return (
         "[[file:"
@@ -398,10 +468,6 @@ def _parse_text_for_heading(
         header_link = "::#" + file_match.group(2)
         heading_name = file_match.group(1).strip(":").strip()
     else:
-        print(
-            "Error: heading {name} not found in file {file}".format(
-                name=heading_name, file=file_name.absolute()
-            )
-        )
+        print(f"Error: heading {heading_name} not found in file {file_name.absolute()}")
 
     return header_link, heading_name
