@@ -15,6 +15,7 @@ pycodestyle obs2org tests
 pydocstyle obs2org tests
 flake8 obs2org tests
 bandit -r obs2org tests
+pylint --disable=no-member --disable=no-name-in-module obs2org tests
 
 
-pre-commit run --all-files
+#pre-commit run --all-files

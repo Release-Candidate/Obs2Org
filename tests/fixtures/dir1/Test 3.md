@@ -15,3 +15,5 @@ Keywords: test, test3
 2023-03-11
 
 Some text.
+
+Cite test: [[@Link]]

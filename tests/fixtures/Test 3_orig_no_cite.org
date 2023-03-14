@@ -8,4 +8,4 @@ Keywords: test, test3
 <2023-03-11>
 Some text.
 
-Cite test: [[cite:@Link]]
+Cite test: [[file:@Link.org][@Link]]

@@ -150,6 +150,7 @@ obs2org/doc/source/_build
 
 # Test output files in ./
 [tT]est*.org
+![tT]est*_orig*.org
 Notes_test/
 test-vault/
 out*.txt

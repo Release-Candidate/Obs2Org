@@ -188,7 +188,7 @@ Output:
 ```ps1
 > python -m obs2org --help
 
-usage: python -m obs2org [-h] [-V] [-p PANDOC] [-o OUT_PATH] [MARKDOWN_FILES ...]
+usage: python -m obs2org [-h] [-V] [-p PANDOC] [-n] [-u] [-o OUT_PATH] [MARKDOWN_FILES ...]
 
 Converts markdown formatted files to Org-Mode formatted files using Pandoc.
 
@@ -265,6 +265,28 @@ python -m obs2org ./Markdown -o ../Org/ --pandoc c:/pandoc/pandoc
     the same base filename but a `.org` suffix in the directory `../Org`.
     The directory to save to _must_ have a slash `/` at the end.
 
+6. Add UUID file headers to any file that doesn't already have one - flag `-u` or `--uuid`:
+
+    ```ps1
+    python -m obs2org ./Markdown -o ../Org/ -u
+    ```
+
+    Converts all markdown files with a suffix of `.md` in the directory
+    `./Markdown` and its subdirectories to files in Org-Mode format with
+    the same base filename but a `.org` suffix in the directory `../Org`. Add file headers with an UUID if not already present.
+    The directory to save to _must_ have a slash `/` at the end.
+
+7. Treat Pandoc-style citation links as normal links - flag `-n` or `--no-cite`:
+
+    ```ps1
+    python -m obs2org ./Markdown -o ../Org/ -n
+    ```
+
+    Converts all markdown files with a suffix of `.md` in the directory
+    `./Markdown` and its subdirectories to files in Org-Mode format with
+    the same base filename but a `.org` suffix in the directory `../Org`. Treat links like `[[@Name]]` as normal link to a file `@Name.org` instead of Pandoc-style citation `[[cite:@Link]]`.
+    The directory to save to _must_ have a slash `/` at the end.
+
 ### Supported Links
 
 The following list shows which Markdown links are converted to which Org-Mode links:
@@ -274,6 +296,10 @@ The following list shows which Markdown links are converted to which Org-Mode li
 - `[[#heading-id|Caption]]` is changed to `[[#heading-id][Caption]]`
 - `[[file|Caption]]` is changed to `[[file][Caption]]`
 - `[[#Heading]]` is changed to `[[*Heading]]`
+- if `-n` or `--no-cite` is set, a Pandoc citation is treated as a normal link:
+    `[[@Link]]` is changed to `[[file:@Link.org][Link]]`
+- as default Pandoc citation links are converted to citation links:
+    `[[@Link]]` is changed to `[[cite:@Link]]`
 
 ## Development
 
