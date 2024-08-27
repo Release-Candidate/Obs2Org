@@ -1,5 +1,8 @@
 # Obs2Org
 
+> [!WARNING]
+> This repository has been moved to [Codeberg: Obs2Org](https://codeberg.org/Release-Candidate/Obs2Org)
+
 [![GPLv3 license badge](https://img.shields.io/github/license/Release-Candidate/Obs2Org)](https://github.com/Release-Candidate/Obs2Org/blob/main/LICENSE)
 [![Python version badge](https://img.shields.io/pypi/pyversions/Obs2Org)](https://www.python.org/downloads/)
 [![PIP version badge](https://img.shields.io/pypi/v/Obs2Org)](https://pypi.org/project/Obs2Org/)
